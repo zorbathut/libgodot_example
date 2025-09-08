@@ -1,0 +1,9 @@
+# Build output
+driver
+*.o
+*.os
+
+# SCons files
+.sconsign.dblite
+.sconf_temp/
+config.log

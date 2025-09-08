@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+env = Environment()
+
+# Add include paths
+env.Append(CPPPATH=[
+    "../godot-cpp/include",
+    "../godot-cpp/gen/include",
+    "../godot-cpp/gdextension",
+])
+
+# Add library paths
+env.Append(LIBPATH=[
+    "../godot/bin",
+    "../godot-cpp/bin",
+])
+
+# Add libraries
+env.Append(LIBS=[
+    "godot-cpp.linux.template_debug.x86_64",
+    "godot.linuxbsd.editor.x86_64.shared_library",
+])
+
+# Compiler flags
+env.Append(CXXFLAGS=["-std=c++17", "-fPIC"])
+
+# Build the executable
+env.Program("driver", ["main.cpp"])
