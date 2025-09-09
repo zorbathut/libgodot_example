@@ -17,12 +17,12 @@ env.Append(LIBPATH=[
 
 # Add libraries
 env.Append(LIBS=[
-    "godot-cpp.linux.template_debug.x86_64",
-    "godot.linuxbsd.editor.x86_64.shared_library",
+    "godot-cpp.linux.template_debug.dev.x86_64",
+    "godot.linuxbsd.editor.dev.x86_64.shared_library",
 ])
 
 # Compiler flags
-env.Append(CXXFLAGS=["-std=c++17", "-fPIC"])
+env.Append(CXXFLAGS=["-std=c++17", "-fPIC", "-g", "-O0"])
 
 # Build the executable
 env.Program("driver", ["main.cpp"])
