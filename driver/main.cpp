@@ -1,10 +1,19 @@
+#include <chrono>
+#include <cstdio>
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
+
 #include "../godot-cpp/gdextension/gdextension_interface.h"
-#include "../godot-cpp/gen/include/godot_cpp/classes/godot_instance.hpp"
-#include "../godot-cpp/include/godot_cpp/core/object.hpp"
 #include "../godot-cpp/include/godot_cpp/godot.hpp"
+#include "../godot-cpp/include/godot_cpp/core/object.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/engine.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/godot_instance.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/label.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/main_loop.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/node.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/scene_tree.hpp"
+#include "../godot-cpp/gen/include/godot_cpp/classes/window.hpp"
 
 // Forward declarations to avoid including godot headers
 typedef void *CallbackData;
@@ -43,7 +52,7 @@ int main() {
     // Prepare arguments for Godot
     std::vector<std::string> arg_strings = {
         "driver",
-        "--headless"
+        "--path", "project"
     };
     
     // Convert to char* array
@@ -88,9 +97,39 @@ int main() {
     
     std::cout << "Godot started successfully!" << std::endl;
     
-    // Run a few iterations to let Godot initialize
-    for (int i = 0; i < 10 && !godot_instance->iteration(); i++) {
-        std::cout << "Iteration " << (i + 1) << std::endl;
+    // Get the SceneTree directly
+    godot::MainLoop* main_loop = godot::Engine::get_singleton()->get_main_loop();
+    godot::SceneTree* tree = godot::Object::cast_to<godot::SceneTree>(main_loop);
+    
+    // Get the root node of the scene tree  
+    godot::Window* root = tree->get_root();
+    std::cout << "Got root Window!" << std::endl;
+    
+    // Get the current scene
+    godot::Node* current_scene = tree->get_current_scene();
+    if (current_scene) {
+        std::cout << "Got current scene!" << std::endl;
+    } else {
+        std::cout << "No current scene set" << std::endl;
+    }
+    
+    // Find the TargetLabel node
+    godot::Label* target_label = current_scene->get_node<godot::Label>("TargetLabel");
+    
+    // Run for 10 seconds, updating the label text each frame
+    auto start_time = std::chrono::steady_clock::now();
+    int frame_count = 0;
+    while (!godot_instance->iteration()) {
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
+        double seconds_remaining = 10.0 - (elapsed.count() / 1000.0);
+        
+        if (seconds_remaining <= 0) break;
+        
+        frame_count++;
+        char text_buffer[128];
+        std::snprintf(text_buffer, sizeof(text_buffer), "Frame: %d - Shutting down in %.2f seconds", frame_count, seconds_remaining);
+        target_label->set_text(godot::String(text_buffer));
     }
     
     std::cout << "Godot running complete." << std::endl;

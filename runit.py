@@ -29,6 +29,6 @@ subprocess.run(["scons"], cwd="driver", check=True)
 print("Running driver...")
 env = os.environ.copy()
 env["LD_LIBRARY_PATH"] = os.path.abspath("godot/bin") + ":" + env.get("LD_LIBRARY_PATH", "")
-subprocess.run(["./driver"], cwd="driver", env=env, check=True)
+subprocess.run(["./driver/driver"], env=env, check=True)
 
 print("Done!")

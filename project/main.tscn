@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://dgiqsv3ntvl3t"]
+
+[node name="Control" type="CenterContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TargetLabel" type="Label" parent="."]
+layout_mode = 2
+text = "No Text Yet"
