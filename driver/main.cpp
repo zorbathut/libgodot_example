@@ -103,15 +103,9 @@ int main() {
     
     // Get the root node of the scene tree  
     godot::Window* root = tree->get_root();
-    std::cout << "Got root Window!" << std::endl;
     
     // Get the current scene
     godot::Node* current_scene = tree->get_current_scene();
-    if (current_scene) {
-        std::cout << "Got current scene!" << std::endl;
-    } else {
-        std::cout << "No current scene set" << std::endl;
-    }
     
     // Find the TargetLabel node
     godot::Label* target_label = current_scene->get_node<godot::Label>("TargetLabel");
