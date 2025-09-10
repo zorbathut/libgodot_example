@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import sys
 
 print("Initializing Git submodules...")
 subprocess.run(["git", "submodule", "init"], check=True)
@@ -25,6 +26,11 @@ subprocess.run(["scons", "library_type=shared_library", "extra_suffix=shared_lib
 
 print("Building driver...")
 subprocess.run(["scons"], cwd="driver", check=True)
+
+# Check if --no-run parameter was passed
+if "--no-run" in sys.argv:
+    print("Build complete (skipping driver run)!")
+    exit(0)
 
 print("Running driver...")
 env = os.environ.copy()
