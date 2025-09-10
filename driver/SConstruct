@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
+import platform
+
 env = Environment()
+
+# Platform detection
+is_windows = platform.system() == "Windows"
 
 # Add include paths
 env.Append(CPPPATH=[
@@ -15,14 +20,26 @@ env.Append(LIBPATH=[
     "../godot-cpp/bin",
 ])
 
-# Add libraries
-env.Append(LIBS=[
-    "godot-cpp.linux.template_debug.dev.x86_64",
-    "godot.linuxbsd.editor.dev.x86_64.shared_library",
-])
+# Add libraries (platform-specific)
+if is_windows:
+    env.Append(LIBS=[
+        "libgodot-cpp.windows.template_debug.dev.x86_64",
+        "godot.windows.editor.dev.x86_64.shared_library",
+    ])
+else:
+    env.Append(LIBS=[
+        "godot-cpp.linux.template_debug.dev.x86_64",
+        "godot.linuxbsd.editor.dev.x86_64.shared_library",
+    ])
 
-# Compiler flags
-env.Append(CXXFLAGS=["-std=c++17", "-fPIC", "-g", "-O0"])
+# Compiler flags (platform-specific)
+if is_windows:
+    env.Append(CXXFLAGS=["/std:c++17", "/DEBUG", "/EHsc"])
+else:
+    env.Append(CXXFLAGS=["-std=c++17", "-fPIC", "-g", "-O0"])
 
 # Build the executable
-env.Program("driver", ["main.cpp"])
+if is_windows:
+    env.Program("driver.exe", ["main.cpp"])
+else:
+    env.Program("driver", ["main.cpp"])
