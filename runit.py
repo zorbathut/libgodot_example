@@ -4,7 +4,7 @@ import subprocess
 import os
 
 print("Initializing Git submodules...")
-subprocess.run(["git", "submodule", "update", "--init", "--recursive", "--progress"], check=True)
+subprocess.run(["git", "submodule", "init"], check=True)
 
 print("Running scons in the godot directory...")
 # extra_suffix is just for compilation optimization, otherwise the binary and libgodot step on each other's feet and cause massively inflated iterative build times
