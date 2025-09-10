@@ -6,7 +6,7 @@ authors = [
     {name = "Ben Rog-Wilhelm",email = "zorba-github@pavlovian.net"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "scons (>=4.9.1,<5.0.0)"
 ]
