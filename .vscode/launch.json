@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Driver",
+            "name": "Run Driver (Linux)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/driver/driver",
@@ -23,6 +23,22 @@
                     "ignoreFailures": true
                 }
             ],
+            "preLaunchTask": "build-all"
+        },
+        {
+            "name": "Run Driver (Windows)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/driver/driver.exe",
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${workspaceFolder}/godot/bin;${env:PATH}"
+                }
+            ],
+            "stopAtEntry": false,
+            "externalConsole": false,
             "preLaunchTask": "build-all"
         }
     ]
