@@ -22,30 +22,30 @@ else:
 print("Initializing Git submodules...")
 subprocess.run(["git", "submodule", "init"], check=True)
 
-print("Running scons in the godot directory...")
+print("Building Godot executable...")
 # extra_suffix is just for compilation optimization, otherwise the binary and libgodot step on each other's feet and cause massively inflated iterative build times
 subprocess.run(["scons", "extra_suffix=executable", "dev_build=yes", "debug_symbols=yes"], cwd="godot", check=True)
 
+print("Generating project UID cache...")
+subprocess.run([godot_exe, "--path", "../project", "--import", "--headless"], cwd="godot", check=True)
+
 print("Generating extension API and interface files...")
 subprocess.run([godot_exe, "--dump-extension-api", "--dump-gdextension-interface", "--headless"], cwd="godot", check=True)
-
-print("Generating project UID cache...")
-subprocess.run([godot_exe, "--path", ".", "--import", "--headless"], cwd="project", check=True)
 
 print("Moving generated files to godot-cpp/gdextension/...")
 shutil.move("godot/extension_api.json", "godot-cpp/gdextension/extension_api.json")
 shutil.move("godot/gdextension_interface.h", "godot-cpp/gdextension/gdextension_interface.h")
 
-print("Running scons in the godot-cpp directory...")
+print("Building GDExtension bindings...")
 subprocess.run(["scons", "debug_symbols=yes", "dev_build=yes", "optimize=debug"], cwd="godot-cpp", check=True)
 
-print("Building godot with shared library...")
+print("Building Godot shared library...")
 subprocess.run(["scons", "library_type=shared_library", "extra_suffix=shared_library", "dev_build=yes", "debug_symbols=yes"], cwd="godot", check=True)
 
 print("Building driver...")
 subprocess.run(["scons"], cwd="driver", check=True)
 
-# Check if --no-run parameter was passed
+# Check if --no-run parameter was passed; useful for debugging
 if "--no-run" in sys.argv:
     print("Build complete (skipping driver run)!")
     exit(0)
