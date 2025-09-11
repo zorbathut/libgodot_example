@@ -9,7 +9,7 @@ import shutil
 # Platform-specific settings
 is_windows = platform.system() == "Windows"
 if is_windows:
-    godot_exe = "godot/bin/godot.windows.editor.dev.x86_64.executable.exe"
+    godot_exe = os.path.abspath("godot/bin/godot.windows.editor.dev.x86_64.executable.exe")
     driver_exe = "driver/driver.exe"
     lib_path_var = "PATH"
     path_separator = ";"
@@ -28,6 +28,9 @@ subprocess.run(["scons", "extra_suffix=executable", "dev_build=yes", "debug_symb
 
 print("Generating extension API and interface files...")
 subprocess.run([godot_exe, "--dump-extension-api", "--dump-gdextension-interface", "--headless"], cwd="godot", check=True)
+
+print("Generating project UID cache...")
+subprocess.run([godot_exe, "--path", ".", "--import", "--headless"], cwd="project", check=True)
 
 print("Moving generated files to godot-cpp/gdextension/...")
 shutil.move("godot/extension_api.json", "godot-cpp/gdextension/extension_api.json")
