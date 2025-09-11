@@ -15,14 +15,14 @@
 #include "../godot-cpp/gen/include/godot_cpp/classes/scene_tree.hpp"
 #include "../godot-cpp/gen/include/godot_cpp/classes/window.hpp"
 
-// Forward declarations to avoid including godot headers
-typedef void *CallbackData;
-typedef void *ExecutorData;
-typedef void (*InvokeCallback)(CallbackData p_data);
-typedef void (*InvokeCallbackFunction)(InvokeCallback p_callback, CallbackData p_callback_data, ExecutorData p_executor_data);
-
+// actual API
 extern "C" {
-    GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, InvokeCallbackFunction p_async_func, ExecutorData p_async_data, InvokeCallbackFunction p_sync_func, ExecutorData p_sync_data);
+    typedef struct {
+        const char* key;
+        void* val;
+    } LibGodotExtensionParameter;
+
+    GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, LibGodotExtensionParameter *p_params);
     void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
 }
 
@@ -66,10 +66,7 @@ int main() {
         args.size(),
         args.data(),
         init_callback,
-        nullptr,  // async func
-        nullptr,  // async data
-        nullptr,  // sync func
-        nullptr   // sync data
+        nullptr
     );
     
     if (!instance) {
