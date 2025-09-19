@@ -17,12 +17,7 @@
 
 // actual API
 extern "C" {
-    typedef struct {
-        const char* key;
-        void* val;
-    } LibGodotExtensionParameter;
-
-    GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, LibGodotExtensionParameter *p_params);
+    GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func);
     void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
 }
 
@@ -65,8 +60,7 @@ int main() {
     GDExtensionObjectPtr instance = libgodot_create_godot_instance(
         args.size(),
         args.data(),
-        init_callback,
-        nullptr
+        init_callback
     );
     
     if (!instance) {
