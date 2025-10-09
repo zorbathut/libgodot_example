@@ -16,4 +16,12 @@
     </Reference>
   </ItemGroup>
 
+  <Target Name="CopyGodotSharpToOutput" AfterTargets="Build">
+    <!-- Copy the entire GodotSharp directory to the output directory -->
+    <ItemGroup>
+      <GodotSharpFiles Include="../godot/bin/GodotSharp/**/*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GodotSharpFiles)" DestinationFiles="@(GodotSharpFiles->'$(OutputPath)GodotSharp/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
