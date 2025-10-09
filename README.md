@@ -1,3 +1,9 @@
+** What This Is
+
+Example of how to use LibGodot from C++. This is currently aimed at the Godot master branch, since LibGodot hasn't yet been released in a final version; this means it needs to do a whole lot of extra work in order to get a functioning GDExtension with the new APIs.
+
+Once Godot 4.6 is released, most of this won't be necessary.
+
 ** How To Run
 
 Run `./runit.py`.

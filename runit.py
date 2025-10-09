@@ -24,7 +24,8 @@ subprocess.run(["git", "submodule", "init"], check=True)
 
 print("Building Godot executable...")
 # extra_suffix is just for compilation optimization, otherwise the binary and libgodot step on each other's feet and cause massively inflated iterative build times
-subprocess.run(["scons", "extra_suffix=executable", "dev_build=yes", "debug_symbols=yes"], cwd="godot", check=True)
+# scu_build is just to make the build faster
+subprocess.run(["scons", "extra_suffix=executable", "dev_build=yes", "debug_symbols=yes", "scu_build=yes"], cwd="godot", check=True)
 
 print("Generating project UID cache...")
 subprocess.run([godot_exe, "--path", "../project", "--import", "--headless"], cwd="godot", check=True)
@@ -40,7 +41,7 @@ print("Building GDExtension bindings...")
 subprocess.run(["scons", "debug_symbols=yes", "dev_build=yes", "optimize=debug"], cwd="godot-cpp", check=True)
 
 print("Building Godot shared library...")
-subprocess.run(["scons", "library_type=shared_library", "extra_suffix=shared_library", "dev_build=yes", "debug_symbols=yes"], cwd="godot", check=True)
+subprocess.run(["scons", "library_type=shared_library", "extra_suffix=shared_library", "dev_build=yes", "debug_symbols=yes", "scu_build=yes"], cwd="godot", check=True)
 
 print("Building driver...")
 subprocess.run(["scons"], cwd="driver", check=True)
