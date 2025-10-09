@@ -8,6 +8,9 @@ class Program
 {
     static int Main(string[] args)
     {
+        // set directory to the root
+        System.Environment.CurrentDirectory = "/home/zorba/werk/libgodot_example";
+        
         Console.WriteLine("Starting Godot instance...");
 
         // Prepare arguments for Godot

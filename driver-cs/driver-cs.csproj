@@ -12,7 +12,7 @@
     <!-- Reference the Godot C# API assemblies that will be built by the build process -->
     <Reference Include="GodotSharp">
       <HintPath>../godot/bin/GodotSharp/Api/Debug/GodotSharp.dll</HintPath>
-      <Private>false</Private>
+      <Private>true</Private>
     </Reference>
   </ItemGroup>
 

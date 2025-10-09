@@ -48,35 +48,6 @@ public static class LibGodot
     private static GDExtensionInitializationCallback initDelegate = new GDExtensionInitializationCallback(InitializeCallback);
     private static GDExtensionInitializationCallback deinitDelegate = new GDExtensionInitializationCallback(DeinitializeCallback);
 
-    public static string? RepoPath { get; private set; }
-
-    static LibGodot()
-    {
-        // Find Git repository root
-        for (var dir = new System.IO.DirectoryInfo(AppContext.BaseDirectory); dir != null; dir = dir.Parent)
-        {
-            if (System.IO.Directory.Exists(System.IO.Path.Combine(dir.FullName, ".git")))
-            {
-                RepoPath = dir.FullName;
-                break;
-            }
-        }
-
-        // Set up DLL import resolver for relative paths
-        NativeLibrary.SetDllImportResolver(typeof(LibGodot).Assembly, Resolve);
-    }
-
-    private static IntPtr Resolve(string libraryName, System.Reflection.Assembly asm, DllImportSearchPath? paths)
-    {
-        if (RepoPath != null && NativeLibrary.TryLoad(System.IO.Path.Combine(RepoPath, libraryName), out var handle))
-        {
-            return handle;
-        }
-
-        // Let the runtime try its defaults (LD_LIBRARY_PATH/rpath/etc.)
-        return IntPtr.Zero;
-    }
-
     public static bool InitCallback(IntPtr p_get_proc_address, IntPtr p_library, ref GDExtensionInitialization r_initialization)
     {
         r_initialization.minimum_initialization_level = GDExtensionInitializationLevel.GDEXTENSION_INITIALIZATION_CORE;
