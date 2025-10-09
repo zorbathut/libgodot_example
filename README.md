@@ -4,13 +4,21 @@ Example of how to use LibGodot from C++. This is currently aimed at the Godot ma
 
 Once Godot 4.6 is released, most of this won't be necessary.
 
-** How To Run
+** How To Run C++
 
-Run `./runit.py`.
+Run `./runit-cpp.py`.
 
 It will take a while; it has to build the entire Godot engine twice, plus some more stuff.
 
 Godot is started from C++, then the label text is updated from the same C++. There's no scripting in this project! It's all driven by the outer harness starting Godot itself.
+
+** How To Run C#
+
+Run `./runit-cs.py`.
+
+It will take a while; it has to build the entire Godot engine twice, plus some more stuff.
+
+Godot is started from C#, then the label text is updated from the same C#. There's no scripting in this project! It's all driven by the outer harness starting Godot itself.
 
 Supports Windows and Linux.
 
