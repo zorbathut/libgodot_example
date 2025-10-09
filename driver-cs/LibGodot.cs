@@ -36,6 +36,12 @@ public static class LibGodot
         int p_argc,
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] p_argv,
         GDExtensionInitializationFunction p_init_func);
+    
+    [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr libgodot_create_godot_instance_and_start(
+        int p_argc,
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] p_argv,
+        GDExtensionInitializationFunction p_init_func);
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
     public static extern void libgodot_destroy_godot_instance(IntPtr p_godot_instance);

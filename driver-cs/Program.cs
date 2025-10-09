@@ -21,7 +21,7 @@ class Program
         };
 
         // Create Godot instance via P/Invoke
-        IntPtr instancePtr = LibGodot.libgodot_create_godot_instance(
+        IntPtr instancePtr = LibGodot.libgodot_create_godot_instance_and_start(
             godotArgs.Length,
             godotArgs,
             LibGodot.InitCallback
@@ -50,13 +50,6 @@ class Program
         if (godotInstance == null)
         {
             Console.Error.WriteLine("Failed to cast to GodotInstance");
-            LibGodot.libgodot_destroy_godot_instance(instancePtr);
-            return 1;
-        }
-
-        if (!godotInstance.Start())
-        {
-            Console.Error.WriteLine("Error starting Godot instance");
             LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
