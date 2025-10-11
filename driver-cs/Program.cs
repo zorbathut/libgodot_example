@@ -36,8 +36,7 @@ class Program
         Console.WriteLine("Godot instance created successfully!");
 
         // Get the GodotInstance object from the native pointer
-        // In C# with Godot 4.x, we need to use GodotObject.InstanceFromId or similar
-        // However, for libgodot we need to directly work with the instance
+        // This is currently messy because we end up using an internal API that was never meant to be touched.
         GodotObject? instanceObj = Godot.NativeInterop.InteropUtils.UnmanagedGetManaged(instancePtr);
         if (instanceObj == null)
         {
