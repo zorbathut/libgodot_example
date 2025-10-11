@@ -47,9 +47,6 @@ subprocess.run([godot_exe, "--path", "../project", "--import", "--headless"], cw
 print("Building Godot shared library with Mono support...")
 subprocess.run(["scons", "module_mono_enabled=yes", "library_type=shared_library", "extra_suffix=shared_library", "dev_build=yes", "debug_symbols=yes", "scu_build=yes"], cwd="godot", check=True)
 
-print("Creating NuGet packages directory...")
-os.makedirs("godot/bin/GodotSharp/Tools/nupkgs", exist_ok=True)
-
 print("Building driver-cs...")
 subprocess.run(["dotnet", "build"], cwd="driver-cs", check=True)
 
