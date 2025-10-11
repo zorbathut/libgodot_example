@@ -32,19 +32,19 @@ public static class LibGodot
     const string LIBGODOT_LIBRARY_NAME = "godot/bin/libgodot.linuxbsd.editor.dev.x86_64.shared_library";
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr libgodot_create_godot_instance(
+    public static extern ulong libgodot_create_godot_instance(
         int p_argc,
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] p_argv,
         GDExtensionInitializationFunction p_init_func);
     
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr libgodot_create_godot_instance_and_start(
+    public static extern ulong libgodot_create_godot_instance_and_start(
         int p_argc,
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] p_argv,
         GDExtensionInitializationFunction p_init_func);
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void libgodot_destroy_godot_instance(IntPtr p_godot_instance);
+    public static extern void libgodot_destroy_godot_instance(ulong p_godot_instance);
 
     // Empty callbacks for GDExtension initialization
     private static void InitializeCallback(IntPtr userdata, GDExtensionInitializationLevel level) { }

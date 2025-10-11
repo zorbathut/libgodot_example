@@ -17,8 +17,8 @@
 
 // actual API
 extern "C" {
-    GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func);
-    void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
+    uint64_t libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func);
+    void libgodot_destroy_godot_instance(uint64_t p_godot_instance_id);
 }
 
 // Empty callbacks for GDExtension initialization
@@ -57,13 +57,13 @@ int main() {
     }
     
     // Create Godot instance
-    GDExtensionObjectPtr instance = libgodot_create_godot_instance(
+    uint64_t instanceId = libgodot_create_godot_instance(
         args.size(),
         args.data(),
         init_callback
     );
     
-    if (!instance) {
+    if (instanceId == 0) {
         std::cerr << "Error creating Godot instance" << std::endl;
         return 1;
     }
@@ -71,18 +71,18 @@ int main() {
     std::cout << "Godot instance created successfully!" << std::endl;
     
     // Convert GDExtensionObjectPtr to godot::GodotInstance using godot-cpp
-    godot::Object* obj = godot::internal::get_object_instance_binding(instance);
+    godot::Object* obj = godot::ObjectDB::get_instance(instanceId);
     godot::GodotInstance* godot_instance = static_cast<godot::GodotInstance*>(obj);
     
     if (!godot_instance) {
         std::cerr << "Failed to get GodotInstance from GDExtensionObjectPtr" << std::endl;
-        libgodot_destroy_godot_instance(instance);
+        libgodot_destroy_godot_instance(instanceId);
         return 1;
     }
     
     if (!godot_instance->start()) {
         std::cerr << "Error starting Godot instance" << std::endl;
-        libgodot_destroy_godot_instance(instance);
+        libgodot_destroy_godot_instance(instanceId);
         return 1;
     }
     
@@ -120,7 +120,7 @@ int main() {
     std::cout << "Godot running complete." << std::endl;
     
     // Clean up
-    libgodot_destroy_godot_instance(instance);
+    libgodot_destroy_godot_instance(instanceId);
     std::cout << "Godot instance destroyed." << std::endl;
     
     return 0;
