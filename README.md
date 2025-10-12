@@ -23,3 +23,7 @@ Godot is started from C#, then the label text is updated from the same C#. There
 Supports Windows and Linux.
 
 (You can ignore the poetry file, it's just for me.)
+
+** License
+
+This is dual-licensed under the MIT License and the Unlicense. You're welcome to treat it as under public domain, if such a thing is legal. Go wild.
