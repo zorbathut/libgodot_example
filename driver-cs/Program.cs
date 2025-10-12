@@ -20,8 +20,8 @@ class Program
             "--path", "project"
         };
 
-        // Create Godot instance via P/Invoke
-        ulong instanceId = LibGodot.libgodot_create_godot_instance_and_start(
+        // Create Godot instance via P/Invoke (without starting)
+        ulong instanceId = LibGodot.libgodot_create_godot_instance(
             godotArgs.Length,
             godotArgs,
             LibGodot.InitCallback
@@ -34,6 +34,14 @@ class Program
         }
 
         Console.WriteLine("Godot instance created successfully!");
+
+        // Call start() using our minimal binding
+        if (!LibGodot.CallGodotInstanceStart(instanceId))
+        {
+            Console.Error.WriteLine("Error starting Godot instance");
+            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            return 1;
+        }
 
         // Get the GodotInstance object from the native pointer
         // This is currently messy because we end up using an internal API that was never meant to be touched.
