@@ -128,27 +128,8 @@ public static class LibGodot
             stringNameNewWithLatin1Chars = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceStringNameNewWithLatin1Chars>(stringNameNewWithLatin1CharsPtr);
         }
 
-        return true;
-    }
-
-    // Minimal binding for GodotInstance::start()
-    public static bool CallGodotInstanceStart(ulong instanceId)
-    {
-        if (objectGetInstanceFromId == null || classdbGetMethodBind == null ||
-            objectMethodBindPtrcall == null || stringNameNewWithLatin1Chars == null)
-        {
-            throw new InvalidOperationException("GDExtension interface functions not loaded");
-        }
-
-        // Get the object pointer from the instance ID
-        IntPtr objectPtr = objectGetInstanceFromId(instanceId);
-        if (objectPtr == IntPtr.Zero)
-        {
-            throw new InvalidOperationException("Failed to get object instance from ID");
-        }
-
-        // Get the method bind for GodotInstance::start() if not already cached
-        if (startMethodBind == IntPtr.Zero)
+        // Bind GodotInstance::start() method while we have all the necessary functions loaded
+        if (stringNameNewWithLatin1Chars != null && classdbGetMethodBind != null)
         {
             // Allocate StringName storage (8 bytes each)
             IntPtr classNameStorage = Marshal.AllocHGlobal(STRING_NAME_SIZE);
@@ -166,13 +147,10 @@ public static class LibGodot
                 Marshal.FreeHGlobal(classNameStr);
                 Marshal.FreeHGlobal(methodNameStr);
 
-                // Get the method bind
+                // Get the method bind for GodotInstance::start()
+                // Hash 2240911060 is the signature hash for: bool method() with no parameters
+                // (from extension_api.json, shared by all methods with this signature)
                 startMethodBind = classdbGetMethodBind(classNameStorage, methodNameStorage, 2240911060);
-
-                if (startMethodBind == IntPtr.Zero)
-                {
-                    throw new InvalidOperationException("Failed to get method bind for GodotInstance::start()");
-                }
             }
             finally
             {
@@ -180,6 +158,29 @@ public static class LibGodot
                 Marshal.FreeHGlobal(classNameStorage);
                 Marshal.FreeHGlobal(methodNameStorage);
             }
+        }
+
+        return true;
+    }
+
+    // Minimal binding for GodotInstance::start()
+    public static bool CallGodotInstanceStart(ulong instanceId)
+    {
+        if (objectGetInstanceFromId == null || objectMethodBindPtrcall == null)
+        {
+            throw new InvalidOperationException("GDExtension interface functions not loaded");
+        }
+
+        if (startMethodBind == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("GodotInstance::start() method bind not initialized");
+        }
+
+        // Get the object pointer from the instance ID
+        IntPtr objectPtr = objectGetInstanceFromId(instanceId);
+        if (objectPtr == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("Failed to get object instance from ID");
         }
 
         // Call the method
