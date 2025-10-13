@@ -90,6 +90,16 @@ class Program
             LibGodot.libgodot_destroy_godot_instance(instanceId);
             return 1;
         }
+        
+        // Find the TIcker node
+        // This is here to demonstrate that we can access C# stuff properly
+        Ticker? ticker = currentScene.GetNode<Ticker>("Ticker");
+        if (ticker == null)
+        {
+            Console.Error.WriteLine("Ticker not found in scene");
+            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            return 1;
+        }
 
         // Run for 10 seconds, updating the label text each frame
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -103,7 +113,17 @@ class Program
                 break;
 
             frameCount++;
-            targetLabel.Text = $"Frame: {frameCount} - Shutting down in {secondsRemaining:F2} seconds";
+
+            string match;
+            if (ticker.localAccumulator == frameCount && Ticker.staticAccumulator == frameCount)
+            {
+                match = "(matches!)";
+            }
+            else
+            {
+                match = "(does not match! something is broken)";
+            }
+            targetLabel.Text = $"Frame: {frameCount} - Ticker values {ticker.localAccumulator} and {Ticker.staticAccumulator} {match} - Shutting down in {secondsRemaining:F2} seconds";
         }
 
         Console.WriteLine("Godot running complete.");

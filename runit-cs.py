@@ -41,6 +41,9 @@ subprocess.run([
         "--no-deprecated"
     ], cwd="godot", check=True)
 
+print("Restoring .NET packages...")
+subprocess.run(["dotnet", "restore"], cwd="project", check=True)
+
 print("Generating project UID cache...")
 subprocess.run([godot_exe, "--path", "../project", "--import", "--headless"], cwd="godot", check=True)
 

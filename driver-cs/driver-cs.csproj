@@ -16,6 +16,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\project\project.csproj" />
+  </ItemGroup>
+
   <Target Name="CopyGodotSharpToOutput" AfterTargets="Build">
     <!-- Copy the entire GodotSharp directory to the output directory -->
     <ItemGroup>

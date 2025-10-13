@@ -12,5 +12,9 @@ config_version=5
 
 config/name="project"
 run/main_scene="uid://dgiqsv3ntvl3t"
-config/features=PackedStringArray("4.5")
+config/features=PackedStringArray("4.6", "C#")
 config/icon="res://icon.svg"
+
+[dotnet]
+
+project/assembly_name="project"
