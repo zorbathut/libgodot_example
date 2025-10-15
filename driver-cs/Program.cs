@@ -21,13 +21,13 @@ class Program
         };
 
         // Create Godot instance via P/Invoke (without starting)
-        ulong instanceId = LibGodot.libgodot_create_godot_instance(
+        IntPtr instancePtr = LibGodot.libgodot_create_godot_instance(
             godotArgs.Length,
             godotArgs,
             LibGodot.InitCallback
         );
 
-        if (instanceId == 0)
+        if (instancePtr == IntPtr.Zero)
         {
             Console.Error.WriteLine("Error creating Godot instance");
             return 1;
@@ -36,28 +36,19 @@ class Program
         Console.WriteLine("Godot instance created successfully!");
 
         // Call start() using our minimal binding
-        if (!LibGodot.CallGodotInstanceStart(instanceId))
+        if (!LibGodot.CallGodotInstanceStart(instancePtr))
         {
             Console.Error.WriteLine("Error starting Godot instance");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
 
         // Get the GodotInstance object from the native pointer
-        // This is currently messy because we end up using an internal API that was never meant to be touched.
-        GodotObject? instanceObj = GodotObject.InstanceFromId(instanceId);
-        if (instanceObj == null)
-        {
-            Console.Error.WriteLine("Failed to get GodotInstance from pointer");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
-            return 1;
-        }
-
-        GodotInstance? godotInstance = instanceObj as GodotInstance;
+        GodotInstance? godotInstance = LibGodot.GetGodotInstanceFromPtr(instancePtr);
         if (godotInstance == null)
         {
-            Console.Error.WriteLine("Failed to cast to GodotInstance");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            Console.Error.WriteLine("Failed to get GodotInstance from pointer");
+            LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
 
@@ -69,7 +60,7 @@ class Program
         if (tree == null)
         {
             Console.Error.WriteLine("Failed to get SceneTree");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
 
@@ -78,7 +69,7 @@ class Program
         if (currentScene == null)
         {
             Console.Error.WriteLine("No current scene loaded");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
 
@@ -87,7 +78,7 @@ class Program
         if (targetLabel == null)
         {
             Console.Error.WriteLine("TargetLabel not found in scene");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
         
@@ -97,7 +88,7 @@ class Program
         if (ticker == null)
         {
             Console.Error.WriteLine("Ticker not found in scene");
-            LibGodot.libgodot_destroy_godot_instance(instanceId);
+            LibGodot.libgodot_destroy_godot_instance(instancePtr);
             return 1;
         }
 
@@ -129,7 +120,7 @@ class Program
         Console.WriteLine("Godot running complete.");
 
         // Clean up
-        LibGodot.libgodot_destroy_godot_instance(instanceId);
+        LibGodot.libgodot_destroy_godot_instance(instancePtr);
         Console.WriteLine("Godot instance destroyed.");
 
         return 0;

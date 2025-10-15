@@ -33,9 +33,6 @@ public delegate bool GDExtensionInitializationFunction(IntPtr p_get_proc_address
 public delegate IntPtr GDExtensionInterfaceGetProcAddress(IntPtr p_name);
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate IntPtr GDExtensionInterfaceObjectGetInstanceFromId(ulong p_instance_id);
-
-[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public delegate IntPtr GDExtensionInterfaceClassdbGetMethodBind(IntPtr p_classname, IntPtr p_methodname, long p_hash);
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -44,21 +41,24 @@ public delegate void GDExtensionInterfaceObjectMethodBindPtrcall(IntPtr p_method
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public delegate void GDExtensionInterfaceStringNameNewWithLatin1Chars(IntPtr r_dest, IntPtr p_contents, byte p_is_static);
 
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate ulong GDExtensionInterfaceObjectGetInstanceId(IntPtr p_object);
+
 public static class LibGodot
 {
     const string LIBGODOT_LIBRARY_NAME = "godot/bin/libgodot.linuxbsd.editor.dev.x86_64.shared_library";
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-    public static extern ulong libgodot_create_godot_instance(
+    public static extern IntPtr libgodot_create_godot_instance(
         int p_argc,
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] p_argv,
         GDExtensionInitializationFunction p_init_func);
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void libgodot_destroy_godot_instance(ulong p_godot_instance);
+    public static extern void libgodot_destroy_godot_instance(IntPtr p_godot_instance);
 
     // GDExtension interface function pointers loaded during initialization
-    private static GDExtensionInterfaceObjectGetInstanceFromId? objectGetInstanceFromId;
+    private static GDExtensionInterfaceObjectGetInstanceId? objectGetInstanceId;
     private static GDExtensionInterfaceClassdbGetMethodBind? classdbGetMethodBind;
     private static GDExtensionInterfaceObjectMethodBindPtrcall? objectMethodBindPtrcall;
     private static GDExtensionInterfaceStringNameNewWithLatin1Chars? stringNameNewWithLatin1Chars;
@@ -86,13 +86,13 @@ public static class LibGodot
         // Load the GDExtension interface functions we need
         var getProcAddress = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceGetProcAddress>(p_get_proc_address);
 
-        // Load object_get_instance_from_id
-        IntPtr objectGetInstanceFromIdName = Marshal.StringToHGlobalAnsi("object_get_instance_from_id");
-        IntPtr objectGetInstanceFromIdPtr = getProcAddress(objectGetInstanceFromIdName);
-        Marshal.FreeHGlobal(objectGetInstanceFromIdName);
-        if (objectGetInstanceFromIdPtr != IntPtr.Zero)
+        // Load object_get_instance_id
+        IntPtr objectGetInstanceIdName = Marshal.StringToHGlobalAnsi("object_get_instance_id");
+        IntPtr objectGetInstanceIdPtr = getProcAddress(objectGetInstanceIdName);
+        Marshal.FreeHGlobal(objectGetInstanceIdName);
+        if (objectGetInstanceIdPtr != IntPtr.Zero)
         {
-            objectGetInstanceFromId = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceObjectGetInstanceFromId>(objectGetInstanceFromIdPtr);
+            objectGetInstanceId = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceObjectGetInstanceId>(objectGetInstanceIdPtr);
         }
 
         // Load classdb_get_method_bind
@@ -158,9 +158,9 @@ public static class LibGodot
     }
 
     // Minimal binding for GodotInstance::start()
-    public static bool CallGodotInstanceStart(ulong instanceId)
+    public static bool CallGodotInstanceStart(IntPtr godotInstancePtr)
     {
-        if (objectGetInstanceFromId == null || objectMethodBindPtrcall == null)
+        if (objectMethodBindPtrcall == null)
         {
             throw new InvalidOperationException("GDExtension interface functions not loaded");
         }
@@ -170,19 +170,12 @@ public static class LibGodot
             throw new InvalidOperationException("GodotInstance::start() method bind not initialized");
         }
 
-        // Get the object pointer from the instance ID
-        IntPtr objectPtr = objectGetInstanceFromId(instanceId);
-        if (objectPtr == IntPtr.Zero)
-        {
-            throw new InvalidOperationException("Failed to get object instance from ID");
-        }
-
-        // Call the method
+        // Call the method using the raw object pointer
         bool returnValue = false;
         IntPtr retPtr = Marshal.AllocHGlobal(Marshal.SizeOf<bool>());
         try
         {
-            objectMethodBindPtrcall(startMethodBind, objectPtr, IntPtr.Zero, retPtr);
+            objectMethodBindPtrcall(startMethodBind, godotInstancePtr, IntPtr.Zero, retPtr);
             returnValue = Marshal.ReadByte(retPtr) != 0;
         }
         finally
@@ -191,5 +184,25 @@ public static class LibGodot
         }
 
         return returnValue;
+    }
+
+    // Helper to get GodotInstance from pointer
+    public static Godot.GodotInstance? GetGodotInstanceFromPtr(IntPtr godotInstancePtr)
+    {
+        if (objectGetInstanceId == null)
+        {
+            throw new InvalidOperationException("GDExtension interface functions not loaded");
+        }
+
+        // Get the instance ID from the pointer
+        ulong instanceId = objectGetInstanceId(godotInstancePtr);
+        if (instanceId == 0)
+        {
+            return null;
+        }
+
+        // Use Godot's internal API to get the managed object from the instance ID
+        Godot.GodotObject? obj = Godot.GodotObject.InstanceFromId(instanceId);
+        return obj as Godot.GodotInstance;
     }
 }
