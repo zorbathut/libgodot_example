@@ -2,9 +2,7 @@ using System;
 using System.Runtime.InteropServices.JavaScript;
 using Godot;
 
-namespace DriverCSWeb;
-
-public partial class Program
+public partial class GodotLauncher
 {
     private static IntPtr godotInstancePtr = IntPtr.Zero;
     private static GodotInstance? godotInstance = null;
@@ -30,7 +28,7 @@ public partial class Program
             // Prepare arguments for Godot
             string[] godotArgs = new string[]
             {
-                "driver-web",
+                "godot-launcher",
                 "--path", "/project"  // In WASM, we'll need to mount the project files
             };
 

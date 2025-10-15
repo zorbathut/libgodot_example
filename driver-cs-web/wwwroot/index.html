@@ -107,7 +107,7 @@
 
                 // Import .NET WASM runtime
                 // The path will need to be adjusted based on where dotnet.js is located
-                const { dotnet } = await import('./dotnet.js');
+                const { dotnet } = await import('./_framework/dotnet.js');
 
                 updateStatus('Initializing .NET Runtime...');
 
@@ -124,12 +124,11 @@
                 const exports = await getAssemblyExports(config.mainAssemblyName);
 
                 // Make C# exports available globally for main.js
-                globalThis.DriverCSWeb = exports.DriverCSWeb;
+                globalThis.GodotLauncher = exports.GodotLauncher;
 
                 updateStatus('Initializing Godot...');
 
-                // Call into C# to initialize Godot
-                const result = exports.DriverCSWeb.Program.InitializeGodot();
+                const result = globalThis.GodotLauncher.InitializeGodot();
 
                 if (result !== 0) {
                     throw new Error(`Godot initialization failed with code ${result}`);

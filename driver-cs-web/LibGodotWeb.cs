@@ -1,8 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace DriverCSWeb;
-
 public enum GDExtensionInitializationLevel
 {
     GDEXTENSION_INITIALIZATION_CORE,

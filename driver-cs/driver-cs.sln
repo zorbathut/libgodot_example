@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "driver-cs", "driver-cs.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "project", "..\project\project.csproj", "{55D8C4AC-03EE-48FC-8348-B98A54F5E6DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "driver-cs-web", "..\driver-cs-web\driver-cs-web.csproj", "{3F2D6153-12DF-476A-A8CB-B6AD92111F40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{55D8C4AC-03EE-48FC-8348-B98A54F5E6DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55D8C4AC-03EE-48FC-8348-B98A54F5E6DA}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{55D8C4AC-03EE-48FC-8348-B98A54F5E6DA}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{3F2D6153-12DF-476A-A8CB-B6AD92111F40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F2D6153-12DF-476A-A8CB-B6AD92111F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F2D6153-12DF-476A-A8CB-B6AD92111F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F2D6153-12DF-476A-A8CB-B6AD92111F40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -205,7 +205,7 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 print(f"\nStarting web server on http://localhost:{PORT}")
-print("Open http://localhost:{PORT} in your browser to test")
+print(f"Open http://localhost:{PORT}/index.html in your browser to test")
 print("Press Ctrl+C to stop the server")
 print()
 
