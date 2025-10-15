@@ -125,7 +125,10 @@ except subprocess.CalledProcessError as e:
     print("=" * 60)
     sys.exit(1)
 
-# TODO: Phase 8 - Build driver-cs-web (will add after Godot changes work)
+print("=" * 60)
+print("PHASE 8: Build driver-cs-web (C# Bootstrap)")
+print("=" * 60)
+subprocess.run(["dotnet", "publish", "-c", "Release"], cwd="driver-cs-web", check=True)
 
 # Create output directory
 output_dir = "build/web-cs"
@@ -135,16 +138,43 @@ if os.path.exists(output_dir):
 os.makedirs(output_dir, exist_ok=True)
 
 print("=" * 60)
-print("PHASE 8: Export project for web")
+print("PHASE 9: Assemble web export manually")
 print("=" * 60)
-# Use the editor we built to export the project
-subprocess.run([
-    godot_exe,
-    "--headless",
-    "--path", "../project",
-    "--export-release", "Web",
-    f"../{output_dir}/index.html"
-], cwd="godot", check=True)
+
+# Copy driver-cs-web publish output
+driver_publish = "driver-cs-web/bin/Release/net8.0/browser-wasm/publish"
+print(f"Copying driver-cs-web from {driver_publish}...")
+for item in os.listdir(driver_publish):
+    src = os.path.join(driver_publish, item)
+    dst = os.path.join(output_dir, item)
+    if os.path.isfile(src):
+        shutil.copy2(src, dst)
+    elif os.path.isdir(src):
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+
+# Copy Godot WASM files
+print("Copying Godot WASM library...")
+godot_wasm_base = "godot/bin/godot.web.template_release.wasm32.cs_webexport.mono"
+shutil.copy2(f"{godot_wasm_base}.wasm", f"{output_dir}/godot.wasm")
+shutil.copy2(f"{godot_wasm_base}.js", f"{output_dir}/godot.js")
+
+# Copy Godot C# assemblies
+print("Copying GodotSharp assemblies...")
+godot_sharp_dir = os.path.join(output_dir, "GodotSharp")
+os.makedirs(godot_sharp_dir, exist_ok=True)
+shutil.copytree("godot/bin/GodotSharp", godot_sharp_dir, dirs_exist_ok=True)
+
+# Copy project files (we'll need to handle this differently for web)
+print("Copying project files...")
+project_dir = os.path.join(output_dir, "project")
+os.makedirs(project_dir, exist_ok=True)
+# For now, just copy the .pck file if export created one
+# Later we'll handle filesystem mounting properly
+
+print(f"\n{'=' * 60}")
+print("Assembly complete!")
+print(f"{'=' * 60}")
+print(f"Output directory: {output_dir}/")
 
 # Check if --no-run parameter was passed
 if "--no-run" in sys.argv:
@@ -152,10 +182,15 @@ if "--no-run" in sys.argv:
     print("Build complete (skipping server)!")
     print("="*60)
     print(f"\nWeb build output: {output_dir}/")
+    print("\nTo test manually:")
+    print("  1. cd build/web-cs")
+    print("  2. python -m http.server 8088")
+    print("  3. Open http://localhost:8088 in your browser")
+    print("  4. Check browser console for C# and Godot output")
     exit(0)
 
 print("\n" + "="*60)
-print("Build complete!")
+print("Build complete! Starting web server...")
 print("="*60)
 print(f"\nWeb build output: {output_dir}/")
 
@@ -170,6 +205,7 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 print(f"\nStarting web server on http://localhost:{PORT}")
+print("Open http://localhost:{PORT} in your browser to test")
 print("Press Ctrl+C to stop the server")
 print()
 

@@ -63,7 +63,9 @@ Create web implementation of libgodot API (modeled on `platform/linuxbsd/libgodo
 - Add conditional compilation of `libgodot_web.cpp` when `module_mono_enabled=yes`
 - Handle Mono-specific link flags for web
 
-### Phase 3: C# Web Driver Bootstrap
+### Phase 3: C# Web Driver Bootstrap (Standalone for Now)
+
+**Strategy**: Build driver-cs-web as a standalone proof-of-concept first, manually assemble the web export. Once working, integrate into Godot's export system later.
 
 #### Directory: `driver-cs-web/`
 
@@ -86,23 +88,34 @@ Create web implementation of libgodot API (modeled on `platform/linuxbsd/libgodo
 
 **File: `driver-cs-web/Program.cs`**
 Adapt `driver-cs/Program.cs` but for web:
-- Export a JavaScript-callable entry point
+- Export a JavaScript-callable entry point (`[JSExport]` or similar)
 - Use P/Invoke to call libgodot functions in Godot WASM
-- Manage main loop via requestAnimationFrame integration
+- Manage main loop via browser's animation frame (Godot handles this internally)
 - Handle web-specific initialization (no file paths, different args)
 
 **File: `driver-cs-web/LibGodotWeb.cs`**
 Adapt `driver-cs/LibGodot.cs`:
-- Change DllImport to reference the Godot WASM module name
+- DllImport should reference Godot WASM module (Emscripten will handle the linking)
 - Keep same P/Invoke signatures (GDExtension interface is platform-agnostic)
-- Handle WASM-specific marshaling if needed
+- May need `[DllImport("__Internal")]` or similar for WASM
 
-**File: `driver-cs-web/index.html` (template)**
-HTML template that:
-- Loads dotnet.wasm runtime
+**File: `driver-cs-web/index.html`**
+HTML that:
+- Loads .NET WASM runtime (dotnet.js)
 - Configures .NET to load driver-cs-web.dll
+- Has .NET call into C# entry point
+- C# will then load Godot WASM via P/Invoke
 - Provides canvas for Godot rendering
-- Includes proper COOP/COEP headers via meta tags
+- Includes proper COOP/COEP headers
+
+**Manual Assembly Process**:
+1. Build driver-cs-web: `dotnet publish -c Release`
+2. Copy Godot WASM files from `godot/bin/`
+3. Copy .NET WASM runtime files
+4. Copy driver-cs-web publish output
+5. Copy web export template files from Godot (JS glue, etc.)
+6. Create proper directory structure in `build/web-cs/`
+7. Test with local web server
 
 ### Phase 4: Web Export Template Integration
 

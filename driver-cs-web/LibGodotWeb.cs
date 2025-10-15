@@ -1,0 +1,200 @@
+using System;
+using System.Runtime.InteropServices;
+
+namespace DriverCSWeb;
+
+public enum GDExtensionInitializationLevel
+{
+    GDEXTENSION_INITIALIZATION_CORE,
+    GDEXTENSION_INITIALIZATION_SERVERS,
+    GDEXTENSION_INITIALIZATION_SCENE,
+    GDEXTENSION_INITIALIZATION_EDITOR,
+    GDEXTENSION_MAX_INITIALIZATION_LEVEL
+}
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate void GDExtensionInitializationCallback(IntPtr userdata, GDExtensionInitializationLevel level);
+
+[StructLayout(LayoutKind.Sequential)]
+public struct GDExtensionInitialization
+{
+    public GDExtensionInitializationLevel minimum_initialization_level;
+    public IntPtr userdata;
+    public IntPtr initialize;
+    public IntPtr deinitialize;
+}
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate bool GDExtensionInitializationFunction(IntPtr p_get_proc_address, IntPtr p_library, ref GDExtensionInitialization r_initialization);
+
+// GDExtension interface function delegates
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate IntPtr GDExtensionInterfaceGetProcAddress(IntPtr p_name);
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate IntPtr GDExtensionInterfaceClassdbGetMethodBind(IntPtr p_classname, IntPtr p_methodname, long p_hash);
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate void GDExtensionInterfaceObjectMethodBindPtrcall(IntPtr p_method_bind, IntPtr p_instance, IntPtr p_args, IntPtr p_ret);
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate void GDExtensionInterfaceStringNameNewWithLatin1Chars(IntPtr r_dest, IntPtr p_contents, byte p_is_static);
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate ulong GDExtensionInterfaceObjectGetInstanceId(IntPtr p_object);
+
+public static class LibGodotWeb
+{
+    // For WASM, we use "__Internal" or the actual module name
+    // Emscripten will resolve this at link time
+    private const string LIBGODOT_LIBRARY_NAME = "__Internal";
+
+    [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "libgodot_create_godot_instance")]
+    public static extern IntPtr libgodot_create_godot_instance(
+        int p_argc,
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPUTF8Str)] string[] p_argv,
+        GDExtensionInitializationFunction p_init_func);
+
+    [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "libgodot_destroy_godot_instance")]
+    public static extern void libgodot_destroy_godot_instance(IntPtr p_godot_instance);
+
+    // GDExtension interface function pointers loaded during initialization
+    private static GDExtensionInterfaceObjectGetInstanceId? objectGetInstanceId;
+    private static GDExtensionInterfaceClassdbGetMethodBind? classdbGetMethodBind;
+    private static GDExtensionInterfaceObjectMethodBindPtrcall? objectMethodBindPtrcall;
+    private static GDExtensionInterfaceStringNameNewWithLatin1Chars? stringNameNewWithLatin1Chars;
+
+    // Cache for the GodotInstance::start() method bind
+    private static IntPtr startMethodBind = IntPtr.Zero;
+
+    // StringName size (from godot-cpp)
+    private const int STRING_NAME_SIZE = 8;
+
+    // Empty callbacks for GDExtension initialization
+    private static void InitializeCallback(IntPtr userdata, GDExtensionInitializationLevel level) { }
+    private static void DeinitializeCallback(IntPtr userdata, GDExtensionInitializationLevel level) { }
+
+    // Keep delegates alive to prevent garbage collection
+    private static GDExtensionInitializationCallback initDelegate = new GDExtensionInitializationCallback(InitializeCallback);
+    private static GDExtensionInitializationCallback deinitDelegate = new GDExtensionInitializationCallback(DeinitializeCallback);
+
+    public static bool InitCallback(IntPtr p_get_proc_address, IntPtr p_library, ref GDExtensionInitialization r_initialization)
+    {
+        r_initialization.minimum_initialization_level = GDExtensionInitializationLevel.GDEXTENSION_INITIALIZATION_CORE;
+        r_initialization.initialize = Marshal.GetFunctionPointerForDelegate(initDelegate);
+        r_initialization.deinitialize = Marshal.GetFunctionPointerForDelegate(deinitDelegate);
+
+        // Load the GDExtension interface functions we need
+        var getProcAddress = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceGetProcAddress>(p_get_proc_address);
+
+        // Load object_get_instance_id
+        IntPtr objectGetInstanceIdName = Marshal.StringToHGlobalAnsi("object_get_instance_id");
+        IntPtr objectGetInstanceIdPtr = getProcAddress(objectGetInstanceIdName);
+        Marshal.FreeHGlobal(objectGetInstanceIdName);
+        if (objectGetInstanceIdPtr != IntPtr.Zero)
+        {
+            objectGetInstanceId = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceObjectGetInstanceId>(objectGetInstanceIdPtr);
+        }
+
+        // Load classdb_get_method_bind
+        IntPtr classdbGetMethodBindName = Marshal.StringToHGlobalAnsi("classdb_get_method_bind");
+        IntPtr classdbGetMethodBindPtr = getProcAddress(classdbGetMethodBindName);
+        Marshal.FreeHGlobal(classdbGetMethodBindName);
+        if (classdbGetMethodBindPtr != IntPtr.Zero)
+        {
+            classdbGetMethodBind = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceClassdbGetMethodBind>(classdbGetMethodBindPtr);
+        }
+
+        // Load object_method_bind_ptrcall
+        IntPtr objectMethodBindPtrcallName = Marshal.StringToHGlobalAnsi("object_method_bind_ptrcall");
+        IntPtr objectMethodBindPtrcallPtr = getProcAddress(objectMethodBindPtrcallName);
+        Marshal.FreeHGlobal(objectMethodBindPtrcallName);
+        if (objectMethodBindPtrcallPtr != IntPtr.Zero)
+        {
+            objectMethodBindPtrcall = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceObjectMethodBindPtrcall>(objectMethodBindPtrcallPtr);
+        }
+
+        // Load string_name_new_with_latin1_chars
+        IntPtr stringNameNewWithLatin1CharsName = Marshal.StringToHGlobalAnsi("string_name_new_with_latin1_chars");
+        IntPtr stringNameNewWithLatin1CharsPtr = getProcAddress(stringNameNewWithLatin1CharsName);
+        Marshal.FreeHGlobal(stringNameNewWithLatin1CharsName);
+        if (stringNameNewWithLatin1CharsPtr != IntPtr.Zero)
+        {
+            stringNameNewWithLatin1Chars = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceStringNameNewWithLatin1Chars>(stringNameNewWithLatin1CharsPtr);
+        }
+
+        // Bind GodotInstance::start() method
+        if (stringNameNewWithLatin1Chars != null && classdbGetMethodBind != null)
+        {
+            IntPtr classNameStorage = Marshal.AllocHGlobal(STRING_NAME_SIZE);
+            IntPtr methodNameStorage = Marshal.AllocHGlobal(STRING_NAME_SIZE);
+
+            try
+            {
+                IntPtr classNameStr = Marshal.StringToHGlobalAnsi("GodotInstance");
+                IntPtr methodNameStr = Marshal.StringToHGlobalAnsi("start");
+
+                stringNameNewWithLatin1Chars(classNameStorage, classNameStr, 0);
+                stringNameNewWithLatin1Chars(methodNameStorage, methodNameStr, 0);
+
+                Marshal.FreeHGlobal(classNameStr);
+                Marshal.FreeHGlobal(methodNameStr);
+
+                startMethodBind = classdbGetMethodBind(classNameStorage, methodNameStorage, 2240911060);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(classNameStorage);
+                Marshal.FreeHGlobal(methodNameStorage);
+            }
+        }
+
+        return true;
+    }
+
+    // Minimal binding for GodotInstance::start()
+    public static bool CallGodotInstanceStart(IntPtr godotInstancePtr)
+    {
+        if (objectMethodBindPtrcall == null)
+        {
+            throw new InvalidOperationException("GDExtension interface functions not loaded");
+        }
+
+        if (startMethodBind == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("GodotInstance::start() method bind not initialized");
+        }
+
+        bool returnValue = false;
+        IntPtr retPtr = Marshal.AllocHGlobal(Marshal.SizeOf<bool>());
+        try
+        {
+            objectMethodBindPtrcall(startMethodBind, godotInstancePtr, IntPtr.Zero, retPtr);
+            returnValue = Marshal.ReadByte(retPtr) != 0;
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(retPtr);
+        }
+
+        return returnValue;
+    }
+
+    // Helper to get GodotInstance from pointer
+    public static Godot.GodotInstance? GetGodotInstanceFromPtr(IntPtr godotInstancePtr)
+    {
+        if (objectGetInstanceId == null)
+        {
+            throw new InvalidOperationException("GDExtension interface functions not loaded");
+        }
+
+        ulong instanceId = objectGetInstanceId(godotInstancePtr);
+        if (instanceId == 0)
+        {
+            return null;
+        }
+
+        Godot.GodotObject? obj = Godot.GodotObject.InstanceFromId(instanceId);
+        return obj as Godot.GodotInstance;
+    }
+}
