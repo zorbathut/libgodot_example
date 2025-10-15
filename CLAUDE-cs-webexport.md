@@ -149,15 +149,16 @@ May need modifications if C# bootstrap is managing the entry point instead of go
 ## Implementation Order (Recommended)
 
 1. ✅ **Research phase complete** - understand architecture
-2. **Write `runit-cs-webexport.py`** - even if build fails, script is ready
-3. **Add web libgodot implementation** - `godot/platform/web/libgodot_web.cpp`
-4. **Update platform detection** - add "mono" support flags for web
-5. **Test Godot build** - `scons platform=web library_type=shared_library module_mono_enabled=yes`
-6. **Fix build errors** - iterate on Godot platform/module config
-7. **Create driver-cs-web project** - basic C# bootstrap
-8. **Test local WASM loading** - verify C# can load Godot WASM
-9. **Integrate into export template** - wire up JavaScript/HTML
-10. **End-to-end test** - export and run a C# game in browser
+2. ✅ **Write `runit-cs-webexport.py`** - script created and tested
+3. ✅ **Add web libgodot implementation** - `godot/platform/web/libgodot_web.cpp` created
+4. ✅ **Update platform detection** - added "library" and "mono" support flags for web
+5. ✅ **Test Godot build** - `scons platform=web library_type=shared_library module_mono_enabled=yes` SUCCESS!
+6. ✅ **Remove export blockers** - removed C# web export error messages
+7. ✅ **Update C# export plugin** - added web platform early return
+8. **Create driver-cs-web project** - basic C# bootstrap (NEXT STEP)
+9. **Test local WASM loading** - verify C# can load Godot WASM
+10. **Integrate into export template** - wire up JavaScript/HTML
+11. **End-to-end test** - export and run a C# game in browser
 
 ## Key Files Reference
 
