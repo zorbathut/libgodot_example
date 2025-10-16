@@ -2,6 +2,30 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <WasmNativeStrip>false</WasmNativeStrip>
+      <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+      <EmccExtraLDFlags>
+          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc
+          -sUSE_WEBGL2=1
+          -sFULL_ES3=1
+    
+          -lidbfs.js
+          -sFORCE_FILESYSTEM=1
+          
+          --js-library=../godot/platform/web/js/libs/library_godot_audio.js
+          --js-library=../godot/platform/web/js/libs/library_godot_display.js
+          --js-library=../godot/platform/web/js/libs/library_godot_fetch.js
+          --js-library=../godot/platform/web/js/libs/library_godot_input.js
+          --js-library=../godot/platform/web/js/libs/library_godot_javascript_singleton.js
+          --js-library=../godot/platform/web/js/libs/library_godot_os.js
+          --js-library=../godot/platform/web/js/libs/library_godot_runtime.js
+          --js-library=../godot/platform/web/js/libs/library_godot_webgl2.js
+          --js-library=../godot/platform/web/js/libs/library_godot_webmidi.js
+    
+          --js-library=../godot/modules/webrtc/library_godot_webrtc.js
+          --js-library=../godot/modules/websocket/library_godot_websocket.js
+          --js-library=../godot/modules/webxr/native/library_godot_webxr.js
+      </EmccExtraLDFlags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,5 +34,8 @@
       <HintPath>../godot/bin/GodotSharp/Api/Release/GodotSharp.dll</HintPath>
       <Private>true</Private>
     </Reference>
+
+    <!-- Link Godot static library -->
+    <NativeFileReference Include="../godot/bin/libgodot.web.template_release.wasm32.cs_webexport.a" />
   </ItemGroup>
 </Project>

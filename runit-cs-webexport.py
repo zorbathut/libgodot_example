@@ -98,37 +98,28 @@ subprocess.run([godot_exe, "--path", "../project", "--import", "--headless"], cw
 print("=" * 60)
 print("PHASE 7: Build Godot as WASM library with Mono support")
 print("=" * 60)
-print("NOTE: This will likely fail until Godot platform code is updated!")
-print("=" * 60)
 # Build Godot for web as a shared library with Mono enabled
 # extra_suffix to avoid conflicts with regular web builds
-try:
-    subprocess.run([
-        "scons",
-        "-j", f"{cores}",
-        "platform=web",
-        "library_type=shared_library",
-        "module_mono_enabled=yes",
-        "target=template_release",
-        "extra_suffix=cs_webexport",
-        "optimize=size"
-    ], cwd="godot", check=True)
-    print("SUCCESS: Godot WASM library built!")
-except subprocess.CalledProcessError as e:
-    print("=" * 60)
-    print("EXPECTED FAILURE: Web platform doesn't support Mono yet")
-    print("Next steps:")
-    print("  1. Modify godot/platform/web/detect.py to add 'mono' support")
-    print("  2. Create godot/platform/web/libgodot_web.cpp")
-    print("  3. Update godot/modules/mono/config.py to allow web platform")
-    print("  4. Re-run this script")
-    print("=" * 60)
-    sys.exit(1)
+subprocess.run([
+    "scons",
+    "-j", f"{cores}",
+    "platform=web",
+    "library_type=static_library",
+    "module_mono_enabled=yes",
+    "module_webxr_enabled=no",
+    "target=template_release",
+    "extra_suffix=cs_webexport",
+    "optimize=size"
+], cwd="godot", check=True)
+print("SUCCESS: Godot WASM library built!")
 
 print("=" * 60)
 print("PHASE 8: Build driver-cs-web (C# Bootstrap)")
 print("=" * 60)
 subprocess.run(["dotnet", "publish", "-c", "Release"], cwd="driver-cs-web", check=True)
+
+print("gotta do more here")
+sys.exit(0)
 
 # Create output directory
 output_dir = "build/web-cs"
@@ -152,11 +143,9 @@ for item in os.listdir(driver_publish):
     elif os.path.isdir(src):
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
-# Copy Godot WASM files
-print("Copying Godot WASM library...")
-godot_wasm_base = "godot/bin/godot.web.template_release.wasm32.cs_webexport.mono"
-shutil.copy2(f"{godot_wasm_base}.wasm", f"{output_dir}/godot.wasm")
-shutil.copy2(f"{godot_wasm_base}.js", f"{output_dir}/godot.js")
+
+# Note: Godot static library is linked directly via NativeFileReference in driver-cs-web.csproj
+# No need to manually copy it - the .NET linker will handle it
 
 # Copy Godot C# assemblies
 print("Copying GodotSharp assemblies...")

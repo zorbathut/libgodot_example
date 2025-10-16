@@ -95,9 +95,10 @@ Adapt `driver-cs/Program.cs` but for web:
 
 **File: `driver-cs-web/LibGodotWeb.cs`**
 Adapt `driver-cs/LibGodot.cs`:
-- DllImport should reference Godot WASM module (Emscripten will handle the linking)
+- DllImport should reference `"__Internal"` for WASM
 - Keep same P/Invoke signatures (GDExtension interface is platform-agnostic)
-- May need `[DllImport("__Internal")]` or similar for WASM
+- Godot WASM will be loaded dynamically at runtime via JavaScript
+- .NET's `[JSImport]` can be used to call JavaScript functions that load and interact with Godot WASM
 
 **File: `driver-cs-web/index.html`**
 HTML that:
