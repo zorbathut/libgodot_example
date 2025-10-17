@@ -19,7 +19,7 @@ public partial class GodotLauncher
     /// This is the entry point that JavaScript will invoke after .NET WASM loads.
     /// </summary>
     [JSExport]
-    public static int InitializeGodot()
+    public unsafe static int InitializeGodot()
     {
         try
         {
@@ -34,11 +34,14 @@ public partial class GodotLauncher
 
             Console.WriteLine("[C#] Creating Godot instance...");
 
+            // Get the function pointer for the callback
+            IntPtr callbackPtr = (IntPtr)(delegate* unmanaged[Cdecl]<IntPtr, IntPtr, GDExtensionInitialization*, int>)&LibGodotWeb.InitCallback;
+            
             // Create Godot instance via P/Invoke
             godotInstancePtr = LibGodotWeb.libgodot_create_godot_instance(
                 godotArgs.Length,
                 godotArgs,
-                LibGodotWeb.InitCallback
+                callbackPtr
             );
 
             if (godotInstancePtr == IntPtr.Zero)

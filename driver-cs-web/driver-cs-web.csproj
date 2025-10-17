@@ -3,9 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
       <WasmNativeStrip>false</WasmNativeStrip>
-      <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
       <EmccExtraLDFlags>
-          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc
+          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc,stackSave,stackRestore,stackAlloc
           -sUSE_WEBGL2=1
           -sFULL_ES3=1
     
@@ -36,6 +35,6 @@
     </Reference>
 
     <!-- Link Godot static library -->
-    <NativeFileReference Include="../godot/bin/libgodot.web.template_release.wasm32.cs_webexport.a" />
+    <NativeFileReference Include="../godot/bin/libgodot.web.template_release.wasm32.nothreads.cs_webexport.a" />
   </ItemGroup>
 </Project>

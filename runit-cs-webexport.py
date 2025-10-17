@@ -109,14 +109,15 @@ subprocess.run([
     "module_webxr_enabled=no",
     "target=template_release",
     "extra_suffix=cs_webexport",
-    "optimize=size"
+    "optimize=size",
+    "threads=no",
 ], cwd="godot", check=True)
 print("SUCCESS: Godot WASM library built!")
 
 print("=" * 60)
 print("PHASE 8: Build driver-cs-web (C# Bootstrap)")
 print("=" * 60)
-subprocess.run(["dotnet", "publish", "-c", "Release"], cwd="driver-cs-web", check=True)
+subprocess.run(["dotnet", "publish"], cwd="driver-cs-web", check=True)
 
 print("gotta do more here")
 sys.exit(0)

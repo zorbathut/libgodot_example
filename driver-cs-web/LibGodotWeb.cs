@@ -45,17 +45,17 @@ public static class LibGodotWeb
 {
     // For WASM, we use "__Internal" or the actual module name
     // Emscripten will resolve this at link time
-    private const string LIBGODOT_LIBRARY_NAME = "__Internal";
+    private const string LIBGODOT_LIBRARY_NAME = "libgodot.web.template_release.wasm32.nothreads.cs_webexport";
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "libgodot_create_godot_instance")]
     public static extern IntPtr libgodot_create_godot_instance(
         int p_argc,
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPUTF8Str)] string[] p_argv,
-        GDExtensionInitializationFunction p_init_func);
+        IntPtr p_init_func);
 
     [DllImport(LIBGODOT_LIBRARY_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "libgodot_destroy_godot_instance")]
     public static extern void libgodot_destroy_godot_instance(IntPtr p_godot_instance);
-
+    
     // GDExtension interface function pointers loaded during initialization
     private static GDExtensionInterfaceObjectGetInstanceId? objectGetInstanceId;
     private static GDExtensionInterfaceClassdbGetMethodBind? classdbGetMethodBind;
@@ -76,11 +76,12 @@ public static class LibGodotWeb
     private static GDExtensionInitializationCallback initDelegate = new GDExtensionInitializationCallback(InitializeCallback);
     private static GDExtensionInitializationCallback deinitDelegate = new GDExtensionInitializationCallback(DeinitializeCallback);
 
-    public static bool InitCallback(IntPtr p_get_proc_address, IntPtr p_library, ref GDExtensionInitialization r_initialization)
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    public static unsafe int InitCallback(IntPtr p_get_proc_address, IntPtr p_library, GDExtensionInitialization* r_initialization)
     {
-        r_initialization.minimum_initialization_level = GDExtensionInitializationLevel.GDEXTENSION_INITIALIZATION_CORE;
-        r_initialization.initialize = Marshal.GetFunctionPointerForDelegate(initDelegate);
-        r_initialization.deinitialize = Marshal.GetFunctionPointerForDelegate(deinitDelegate);
+        r_initialization->minimum_initialization_level = GDExtensionInitializationLevel.GDEXTENSION_INITIALIZATION_CORE;
+        r_initialization->initialize = Marshal.GetFunctionPointerForDelegate(initDelegate);
+        r_initialization->deinitialize = Marshal.GetFunctionPointerForDelegate(deinitDelegate);
 
         // Load the GDExtension interface functions we need
         var getProcAddress = Marshal.GetDelegateForFunctionPointer<GDExtensionInterfaceGetProcAddress>(p_get_proc_address);
@@ -147,7 +148,7 @@ public static class LibGodotWeb
             }
         }
 
-        return true;
+        return 1;
     }
 
     // Minimal binding for GodotInstance::start()
