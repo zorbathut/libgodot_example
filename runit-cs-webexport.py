@@ -52,7 +52,7 @@ print("Initializing Git submodules...")
 subprocess.run(["git", "submodule", "init"], check=True)
 
 print("=" * 60)
-print("PHASE 1: Build native Godot editor with Mono support")
+print("Build native Godot editor with Mono support")
 print("=" * 60)
 # extra_suffix to avoid conflicts with other builds
 subprocess.run([
@@ -66,17 +66,17 @@ subprocess.run([
 ], cwd="godot", check=True)
 
 print("=" * 60)
-print("PHASE 2: Generate Mono glue files")
+print("Generate Mono glue files")
 print("=" * 60)
 subprocess.run([godot_exe, "--headless", "--generate-mono-glue", "./modules/mono/glue"], cwd="godot", check=True)
 
 print("=" * 60)
-print("PHASE 3: Create NuGet packages directory")
+print("Create NuGet packages directory")
 print("=" * 60)
 os.makedirs("godot/bin/GodotSharp/Tools/nupkgs", exist_ok=True)
 
 print("=" * 60)
-print("PHASE 4: Build C# assemblies and NuGet packages")
+print("Build C# assemblies and NuGet packages")
 print("=" * 60)
 subprocess.run([
     "python",
@@ -86,17 +86,71 @@ subprocess.run([
 ], cwd="godot", check=True)
 
 print("=" * 60)
-print("PHASE 5: Restore .NET packages for project")
+print("Restore .NET packages for project")
 print("=" * 60)
 subprocess.run(["dotnet", "restore"], cwd="project", check=True)
 
 print("=" * 60)
-print("PHASE 6: Generate project UID cache")
+print("Generate project UID cache")
 print("=" * 60)
 subprocess.run([godot_exe, "--path", "../project", "--import", "--headless"], cwd="godot", check=True)
 
 print("=" * 60)
-print("PHASE 7: Build Godot as WASM library with Mono support")
+print("Build web export template (release)")
+print("=" * 60)
+# Build the release template for web - this creates a proper export template
+# that can be used by the Godot editor to export the project
+subprocess.run([
+    "scons",
+    "-j", f"{cores}",
+    "platform=web",
+    "target=template_release",
+    "extra_suffix=webex_rel",
+    "module_mono_enabled=yes",
+    "module_webxr_enabled=no",
+    "optimize=size",
+    "threads=no",
+], cwd="godot", check=True)
+print("SUCCESS: Web release export template built!")
+
+print("=" * 60)
+print("Build web export template (debug)")
+print("=" * 60)
+# Build the debug template for web - useful for testing
+subprocess.run([
+    "scons",
+    "-j", f"{cores}",
+    "platform=web",
+    "target=template_debug",
+    "extra_suffix=webex_dbg",
+    "module_mono_enabled=yes",
+    "module_webxr_enabled=no",
+    "threads=no",
+], cwd="godot", check=True)
+print("SUCCESS: Web debug export template built!")
+
+print("=" * 60)
+print("Export project using templates to generate .pck file")
+print("=" * 60)
+# Create a temporary directory for the export
+export_temp_dir = "build/export-temp"
+if os.path.exists(export_temp_dir):
+    shutil.rmtree(export_temp_dir)
+os.makedirs(export_temp_dir, exist_ok=True)
+
+# Use the editor we built to export the project
+# This will create the .pck file we need
+subprocess.run([
+    godot_exe,
+    "--headless",
+    "--path", "../project",
+    "--export-release", "Web",
+    f"../{export_temp_dir}/index.html"
+], cwd="godot", check=True)
+print("SUCCESS: Project exported with .pck file!")
+
+print("=" * 60)
+print("Build Godot as WASM library with Mono support")
 print("=" * 60)
 # Build Godot for web as a shared library with Mono enabled
 # extra_suffix to avoid conflicts with regular web builds
@@ -115,9 +169,18 @@ subprocess.run([
 print("SUCCESS: Godot WASM library built!")
 
 print("=" * 60)
-print("PHASE 8: Build driver-cs-web (C# Bootstrap)")
+print("Build driver-cs-web (C# Bootstrap)")
 print("=" * 60)
 subprocess.run(["dotnet", "publish"], cwd="driver-cs-web", check=True)
+
+print("=" * 60)
+print("Copy .pck file to driver-cs-web output")
+print("=" * 60)
+# Copy the .pck file from the export to the driver-cs-web publish directory
+pck_src = "build/export-temp/index.pck"
+pck_dst = "driver-cs-web/bin/Release/net8.0/publish/wwwroot/project.pck"
+shutil.copy2(pck_src, pck_dst)
+print(f"Copied {pck_src} -> {pck_dst}")
 
 print("gotta do more here")
 sys.exit(0)
@@ -130,7 +193,7 @@ if os.path.exists(output_dir):
 os.makedirs(output_dir, exist_ok=True)
 
 print("=" * 60)
-print("PHASE 9: Assemble web export manually")
+print("Assemble web export manually")
 print("=" * 60)
 
 # Copy driver-cs-web publish output

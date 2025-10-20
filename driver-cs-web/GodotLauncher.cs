@@ -29,7 +29,7 @@ public partial class GodotLauncher
             string[] godotArgs = new string[]
             {
                 "godot-launcher",
-                "--path", "/project"  // In WASM, we'll need to mount the project files
+                "--main-pack", "project.pck"  // Point to the preloaded .pck file
             };
 
             Console.WriteLine("[C#] Creating Godot instance...");

@@ -101,6 +101,48 @@
             statusDiv.classList.add('hidden');
         }
 
+        async function preloadFile(filename) {
+            updateStatus(`Preloading ${filename}...`);
+
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${filename}: ${response.statusText}`);
+                }
+
+                const buffer = await response.arrayBuffer();
+                log(`Preloaded ${filename}: ${buffer.byteLength} bytes`);
+
+                // Write the file to Godot's filesystem using Module.copyToFS
+                // This is the proper Godot API for writing files
+                if (typeof Module !== 'undefined' && typeof Module.copyToFS === 'function') {
+                    log(`Module.copyToFS exists, writing file...`);
+
+                    Module.copyToFS(filename, buffer);
+                    log(`Wrote ${filename} to Godot filesystem using copyToFS`);
+
+                    // Verify the file was written
+                    if (Module.FS) {
+                        try {
+                            const stat = Module.FS.stat(filename);
+                            log(`File ${filename} exists with size: ${stat.size} bytes`);
+                        } catch (e) {
+                            log(`Error verifying file: ${e.message}`, true);
+                        }
+                    }
+                } else {
+                    log(`Module type: ${typeof Module}`, true);
+                    log(`Module.copyToFS type: ${typeof (Module && Module.copyToFS)}`, true);
+                    throw new Error('Module.copyToFS not available');
+                }
+
+                return buffer;
+            } catch (error) {
+                log(`Error preloading ${filename}: ${error.message}`, true);
+                throw error;
+            }
+        }
+
         async function loadAndStartGodot() {
             try {
                 updateStatus('Loading .NET Runtime...');
@@ -112,12 +154,18 @@
                 updateStatus('Initializing .NET Runtime...');
 
                 // Initialize .NET runtime
-                const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
+                const { setModuleImports, getAssemblyExports, getConfig, Module } = await dotnet
                     .withDiagnosticTracing(false)
                     .withApplicationArgumentsFromQuery()
                     .create();
 
                 updateStatus('.NET Runtime initialized');
+
+                // Make Module available globally so preloadFile can access FS
+                globalThis.Module = Module;
+
+                // Preload the .pck file before initializing Godot
+                await preloadFile('project.pck');
 
                 // Get the exports from our C# assembly
                 const config = getConfig();
