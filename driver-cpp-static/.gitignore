@@ -1,0 +1,15 @@
+# Build output
+driver
+driver.exe
+*.o
+*.os
+*.obj
+*.lib
+*.exp
+*.pdb
+*.ilk
+
+# SCons files
+.sconsign.dblite
+.sconf_temp/
+config.log

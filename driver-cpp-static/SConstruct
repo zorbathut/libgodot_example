@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+import platform
+
+env = Environment()
+
+# Platform detection
+is_windows = platform.system() == "Windows"
+
+# Add include paths
+env.Append(CPPPATH=[
+    "../godot-cpp/include",
+    "../godot-cpp/gen/include",
+    "../godot-cpp/gdextension",
+])
+
+# Add library paths
+env.Append(LIBPATH=[
+    "../godot/bin",
+    "../godot-cpp/bin",
+])
+
+# Compiler flags (platform-specific)
+if is_windows:
+    env.Append(CXXFLAGS=["/std:c++17", "/DEBUG", "/EHsc"])
+else:
+    env.Append(CXXFLAGS=["-std=c++17", "-fPIC", "-g", "-O0"])
+
+# For static linking, we need to specify the full library names and link system dependencies
+if is_windows:
+    # Windows static linking
+    env.Append(LIBS=[
+        "libgodot-cpp.windows.template_debug.dev.x86_64",
+        "godot.windows.editor.dev.x86_64.static_library",
+    ])
+    # Windows system libraries will be added here as needed
+else:
+    # Linux static linking
+    # We use LINKFLAGS to control the linking process
+    # -Wl,--start-group and -Wl,--end-group help resolve circular dependencies in static libraries
+    env.Append(LINKFLAGS=[
+        "-Wl,--start-group",
+    ])
+
+    # Static libraries must be listed in dependency order
+    # godot-cpp depends on godot, so it comes first
+    env.Append(LIBS=[
+        "godot-cpp.linux.template_debug.dev.x86_64",
+        "godot.linuxbsd.editor.dev.x86_64.static_library",
+    ])
+
+    # System libraries that Godot depends on
+    # These are needed when statically linking
+    env.Append(LIBS=[
+        # Core system libraries
+        "pthread",      # POSIX threads
+        "dl",           # Dynamic linking (for dlopen, etc.)
+        "rt",           # Real-time extensions
+        "m",            # Math library
+
+        # Graphics and windowing
+        "X11",          # X11 window system
+        "Xrandr",       # X11 resize and rotate extension
+        "Xinerama",     # X11 multi-monitor extension
+        "Xi",           # X11 input extension
+        "Xcursor",      # X11 cursor management
+        "Xrender",      # X11 rendering extension
+
+        # OpenGL
+        "GL",           # OpenGL
+
+        # Audio
+        "asound",       # ALSA audio
+
+        # Other dependencies
+        "z",            # Zlib compression
+    ])
+
+    env.Append(LINKFLAGS=[
+        "-Wl,--end-group",
+    ])
+
+# Build the executable
+if is_windows:
+    env.Program("driver.exe", ["main.cpp"])
+else:
+    env.Program("driver", ["main.cpp"])
