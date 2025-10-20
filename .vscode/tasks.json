@@ -5,7 +5,7 @@
             "label": "build-all",
             "type": "shell",
             "command": "poetry",
-            "args": ["run", "python", "runit.py", "--no-run"],
+            "args": ["run", "python", "runit-cpp-shared.py", "--no-run"],
             "group": {
                 "kind": "build",
                 "isDefault": true

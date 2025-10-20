@@ -10,12 +10,12 @@ import shutil
 is_windows = platform.system() == "Windows"
 if is_windows:
     godot_exe = os.path.abspath("godot/bin/godot.windows.editor.dev.x86_64.executable.exe")
-    driver_exe = "driver/driver.exe"
+    driver_exe = "driver-cpp-shared/driver.exe"
     lib_path_var = "PATH"
     path_separator = ";"
 else:
     godot_exe = "./bin/godot.linuxbsd.editor.dev.x86_64.executable"
-    driver_exe = "./driver/driver"
+    driver_exe = "./driver-cpp-shared/driver"
     lib_path_var = "LD_LIBRARY_PATH"
     path_separator = ":"
 
@@ -44,7 +44,7 @@ print("Building Godot shared library...")
 subprocess.run(["scons", "library_type=shared_library", "extra_suffix=shared_library", "dev_build=yes", "debug_symbols=yes", "scu_build=yes"], cwd="godot", check=True)
 
 print("Building driver...")
-subprocess.run(["scons"], cwd="driver", check=True)
+subprocess.run(["scons"], cwd="driver-cpp-shared", check=True)
 
 # Check if --no-run parameter was passed; useful for debugging
 if "--no-run" in sys.argv:

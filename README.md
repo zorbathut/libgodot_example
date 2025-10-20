@@ -6,7 +6,7 @@ Once Godot 4.6 is released, most of this won't be necessary.
 
 ** How To Run
 
-Run `./runit.py`.
+Run `./runit-cpp-shared.py`.
 
 It will take a while; it has to build the entire Godot engine twice, plus some more stuff.
 

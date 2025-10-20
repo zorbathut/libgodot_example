@@ -5,7 +5,7 @@
             "name": "Run Driver (Linux)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/driver/driver",
+            "program": "${workspaceFolder}/driver-cpp-shared/driver",
             "cwd": "${workspaceFolder}",
             "environment": [
                 {
@@ -29,7 +29,7 @@
             "name": "Run Driver (Windows)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/driver/driver.exe",
+            "program": "${workspaceFolder}/driver-cpp-shared/driver.exe",
             "cwd": "${workspaceFolder}",
             "environment": [
                 {
