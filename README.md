@@ -1,4 +1,4 @@
-** Intro
+## Intro
 
 LibGodot is a framework designed to make Godot embeddable inside other programs. Yay! Examples of things you can do with this:
 
@@ -11,25 +11,25 @@ The current system supports opening a single Godot and then shutting it down, on
 
 Godot doesn't currently provide official builds of the linkable Godot libraries, so you get to compile it yourself.
 
-*** I'd like to dynamically link Godot from C++ on Windows or Linux, how can I do that?
+### I'd like to dynamically link Godot from C++ on Windows or Linux, how can I do that?
 
 Check out this repository!
 
 Note that as of this writing, `godot-cpp` has not been updated to 4.6, so you get to build godot-cpp also. This is an extra pain because in order to build godot-cpp, you need to build Godot itself in executable form, which means you have to do a full build of Godot, *twice*, in order to get this working.
 
-*** . . . on Mac?
+### . . . on Mac?
 
 I don't have a Mac and can't test that. Sorry. I've heard this is a little finicky. Pull requests accepted here, and if it requires Godot engine requests, go send a pull request to the Godot team.
 
-*** . . . from Python or Rust or Malbolge?
+### . . . from Python or Rust or Malbolge?
 
 I'm not going to write an example for every language, but the tl;dr is that all you really need is a Godot API implementation like `godot-cpp` and then just do the same things that you see in [driver-cpp-shared/main.cpp](https://github.com/zorbathut/libgodot_example/blob/master/driver-cpp-shared/main.cpp).
 
-*** . . . without messing with godot-cpp's `internal` functionality?
+### . . . without messing with godot-cpp's `internal` functionality?
 
 The current design requires that interface layers either provide their own custom code to wrap the libgodot calls, or that you do stuff that no other API requires. I was unable to convince people to change this design. So, figure out how to hack your Godot library layer to do the things you need. godot-cpp is convenient here because it unintentionally exposes the exact thing we need as part of an "internal-only" interface. Not internal anymore!
 
-*** . . . from C#?
+### . . . from C#?
 
 Haha, man.
 
@@ -39,13 +39,13 @@ You can run Godot from C# *as long as Godot does not actually use C# itself*. Ob
 
 Perhaps someday the GDExtension C# layer will be ready and this can be better handled.
 
-*** . . . statically-linked?
+### . . . statically-linked?
 
 [Doesn't work, sorry](https://github.com/godotengine/godot/issues/111876).
 
 Yes, I know the build system claims it does. It's lying.
 
-** How To Run
+## How To Run
 
 Run `./runit-cpp-shared.py`.
 
@@ -57,16 +57,16 @@ Supports Windows and Linux.
 
 (You can ignore the poetry file, it's just for me.)
 
-** How To Embed In Your Own Project
+## How To Embed In Your Own Project
 
 This requires building a custom Godot to work so it's a bit of a pain to work into existing projects. I somewhat-maintain [an example framework for vendoring Godot](github.com/zorbathut/dieselhorse_godot_framework) and I recommend at least using it as a reference; it's designed to make it as easy as possible to build and it handles a *lot* of weird corner cases and annoyances. If you don't at least reference it, you're going to spend a lot of time stubbing your toes on the same issues I did. My toes are already stubbed; take advantage of that fact.
 
-** This whole thing seems . . . kind of half-baked?
+## This whole thing seems . . . kind of half-baked?
 
 No comment.
 
-** I'm having an issue, can I talk to you?
+## I'm having an issue, can I talk to you?
 
-Discord name is the same as Github name, feel free to ping me. Note that most questions will probably be answered by "go check libgodot_example, it does that", "go check dieselhorse_godot_framework, it does that", "I don't have an example for that, sorry", or "that doesn't work, sorry". But you're still welcome to ask.
+You can file an issue if you like. Alternatively, Discord name is the same as Github name, feel free to ping me. Note that most questions will probably be answered by "go check libgodot_example, it does that", "go check dieselhorse_godot_framework, it does that", "I don't have an example for that, sorry", or "that doesn't work, sorry". But you're still welcome to ask.
 
 I do accept contract work though right now I charge, like, way more than you should probably want to pay. But I'm also really bad at managing my time so I'm probably more welcome to help you out for free than you might think :V
