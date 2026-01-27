@@ -85,6 +85,6 @@ One issue you'll run into is that the official webasm .net runtimes *require* sp
 
 Is .net 10 better? Dunno! Haven't checked. Go check that.
 
-The issue I ran into with my above attempt is that it *seemed* like everything was working properly, but then Godot couldn't access the virtual filesystem. Or, more precisely, it would attempt to access the virtual filesystem, verify that the files it wanted existed in it, then go to open the files - namely, the project - and fail. I suspect I could have solved this if I'd kept working at it but I'd already invested more time than I was willing to.
+The issue I ran into with my above attempt is that it *seemed* like everything was working properly, but then Godot couldn't access the virtual filesystem. Or, more precisely, it would attempt to access the virtual filesystem, verify that the files it wanted existed in it, then go to open the files - namely, the project - and fail with file-not-found errors. I suspect I could have solved this if I'd kept working at it but I'd already invested more time than I was willing to.
 
 I think it's quite likely that this would work great, and I'd happily talk to people on it, but I don't have a lot of actual development time to spend.
