@@ -74,3 +74,17 @@ No comment.
 You can file an issue if you like. Alternatively, Discord name is the same as Github name, feel free to ping me. Note that most questions will probably be answered by "go check libgodot_example, it does that", "go check dieselhorse_godot_framework, it does that", "I don't have an example for that, sorry", or "that doesn't work, sorry". But you're still welcome to ask.
 
 I do accept contract work though right now I charge, like, way more than you should probably want to pay. But I'm also really bad at managing my time so I'm probably more welcome to help you out for free than you might think :V
+
+## So, hey, wasn't the issue with C# web export some gnarly problem where the .net runtime and Godot runtime both expected to be in charge and running the whole thing? Could you maybe use this to run Godot within the .net runtime, and get a fully working C# web export?
+
+Maybe. I think it's actually promising.
+
+I've got a hacky attempt [over here](https://github.com/zorbathut/libgodot_example/tree/webasm-attempt).  It's kinda old and I never got it working properly.
+
+One issue you'll run into is that the official webasm .net runtimes *require* specific versions of webasm, and at least before .net 10, the version they required was so old that Godot didn't support it. Nothing stops you from just bypassing the Godot checks, of course, but I assume there was a good reason for this version restriction.
+
+Is .net 10 better? Dunno! Haven't checked. Go check that.
+
+The issue I ran into with my above attempt is that it *seemed* like everything was working properly, but then Godot couldn't access the virtual filesystem. Or, more precisely, it would attempt to access the virtual filesystem, verify that the files it wanted existed in it, then go to open the files - namely, the project - and fail. I suspect I could have solved this if I'd kept working at it but I'd already invested more time than I was willing to.
+
+I think it's quite likely that this would work great, and I'd happily talk to people on it, but I don't have a lot of actual development time to spend.
