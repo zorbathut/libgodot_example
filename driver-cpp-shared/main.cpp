@@ -4,16 +4,15 @@
 #include <string>
 #include <vector>
 
-#include "../godot-cpp/gdextension/gdextension_interface.h"
-#include "../godot-cpp/include/godot_cpp/godot.hpp"
-#include "../godot-cpp/include/godot_cpp/core/object.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/engine.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/godot_instance.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/label.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/main_loop.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/node.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/scene_tree.hpp"
-#include "../godot-cpp/gen/include/godot_cpp/classes/window.hpp"
+#include "godot_cpp/godot.hpp"
+#include "godot_cpp/core/object.hpp"
+#include "godot_cpp/classes/engine.hpp"
+#include "godot_cpp/classes/godot_instance.hpp"
+#include "godot_cpp/classes/label.hpp"
+#include "godot_cpp/classes/main_loop.hpp"
+#include "godot_cpp/classes/node.hpp"
+#include "godot_cpp/classes/scene_tree.hpp"
+#include "godot_cpp/classes/window.hpp"
 
 // actual API
 extern "C" {

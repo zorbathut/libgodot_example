@@ -69,4 +69,4 @@ No comment.
 
 Discord name is the same as Github name, feel free to ping me. Note that most questions will probably be answered by "go check libgodot_example, it does that", "go check dieselhorse_godot_framework, it does that", "I don't have an example for that, sorry", or "that doesn't work, sorry". But you're still welcome to ask.
 
-I do accept contract work though right now I charge, like, way more than you should probably want to pay. But I'm also really bad at managing my time so I'm probably more welcome to help you out than you might think :V
+I do accept contract work though right now I charge, like, way more than you should probably want to pay. But I'm also really bad at managing my time so I'm probably more welcome to help you out for free than you might think :V
