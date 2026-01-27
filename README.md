@@ -63,7 +63,7 @@ Supports Windows and Linux.
 
 ## How To Embed In Your Own Project
 
-This requires building a custom Godot to work so it's a bit of a pain to work into existing projects. I somewhat-maintain [an example framework for vendoring Godot](github.com/zorbathut/dieselhorse_godot_framework) and I recommend at least using it as a reference; it's designed to make it as easy as possible to build and it handles a *lot* of weird corner cases and annoyances. If you don't at least reference it, you're going to spend a lot of time stubbing your toes on the same issues I did. My toes are already stubbed; take advantage of that fact.
+This requires building a custom Godot to work so it's a bit of a pain to work into existing projects. I somewhat-maintain [an example framework for vendoring Godot](https://github.com/zorbathut/dieselhorse_godot_framework) and I recommend at least using it as a reference; it's designed to make it as easy as possible to build and it handles a *lot* of weird corner cases and annoyances. If you don't at least reference it, you're going to spend a lot of time stubbing your toes on the same issues I did. My toes are already stubbed; take advantage of that fact.
 
 ## This whole thing seems . . . kind of half-baked?
 
