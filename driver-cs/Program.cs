@@ -82,7 +82,7 @@ class Program
             return 1;
         }
         
-        // Find the TIcker node
+        // Find the Ticker node
         // This is here to demonstrate that we can access C# stuff properly
         Ticker? ticker = currentScene.GetNode<Ticker>("Ticker");
         if (ticker == null)
