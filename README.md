@@ -45,6 +45,10 @@ Perhaps someday the GDExtension C# layer will be ready and this can be better ha
 
 Yes, I know the build system claims it does. It's lying.
 
+### . . . on Android, iPhone, Nintendo Switch, Stadia, Apple Pippin, Nokia N-Gage . . .
+
+Right now, only supported on Linux, Windows, and supposedly Mac desktop. But it honestly wouldn't be hard to add support for other platforms; I encourage you to do so and upstream it.
+
 ## How To Run
 
 Run `./runit-cpp-shared.py`.
