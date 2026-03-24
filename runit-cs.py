@@ -19,8 +19,15 @@ else:
     lib_path_var = "LD_LIBRARY_PATH"
     path_separator = ":"
 
-print("Initializing Git submodules...")
-subprocess.run(["git", "submodule", "init"], check=True)
+def ensure_submodule(path):
+    """Init and update a submodule only if it hasn't been checked out yet."""
+    if not os.path.exists(os.path.join(path, ".git")):
+        print(f"Initializing and updating submodule '{path}'...")
+        subprocess.run(["git", "submodule", "update", "--init", path], check=True)
+    else:
+        print(f"Submodule '{path}' already checked out, skipping update.")
+
+ensure_submodule("godot")
 
 print("Building Godot executable with Mono support...")
 # extra_suffix is just for compilation optimization, otherwise the binary and libgodot step on each other's feet and cause massively inflated iterative build times
