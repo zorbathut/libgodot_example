@@ -4,7 +4,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
       <WasmNativeStrip>false</WasmNativeStrip>
       <EmccExtraLDFlags>
-          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc,stackSave,stackRestore,stackAlloc
+          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc,_free,_sbrk,_memalign,_memset,_memcpy,_memmove,stackSave,stackRestore,stackAlloc
           -sUSE_WEBGL2=1
           -sFULL_ES3=1
     
