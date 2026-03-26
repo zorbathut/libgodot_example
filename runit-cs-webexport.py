@@ -79,7 +79,7 @@ print("=" * 60)
 print("Build C# assemblies and NuGet packages")
 print("=" * 60)
 subprocess.run([
-    "python",
+    sys.executable,
     "./modules/mono/build_scripts/build_assemblies.py",
     "--godot-output-dir", "./bin",
     "--no-deprecated"
