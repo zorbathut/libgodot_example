@@ -4,7 +4,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
       <WasmNativeStrip>false</WasmNativeStrip>
       <EmccExtraLDFlags>
-          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc,_free,_sbrk,_memalign,_memset,_memcpy,_memmove,stackSave,stackRestore,stackAlloc
+          -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc,_free,_sbrk,_memalign,_memset,_memcpy,_memmove,_gdext_wrapper_set_proc_address,_gdext_wrapper_load_interface,_gdext_wrapper_string_name_new,_gdext_wrapper_classdb_get_method_bind,_gdext_wrapper_object_method_bind_ptrcall,_gdext_wrapper_object_get_instance_id,stackSave,stackRestore,stackAlloc
           -sUSE_WEBGL2=1
           -sFULL_ES3=1
     
@@ -36,5 +36,8 @@
 
     <!-- Link Godot static library -->
     <NativeFileReference Include="../godot/bin/libgodot.web.template_release.wasm32.nothreads.cs_webexport.a" />
+
+    <!-- C wrapper for GDExtension function pointer calls (WASM trampoline workaround) -->
+    <NativeFileReference Include="gdextension_wrappers.c" />
   </ItemGroup>
 </Project>

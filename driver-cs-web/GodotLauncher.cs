@@ -52,6 +52,9 @@ public partial class GodotLauncher
 
             Console.WriteLine("[C#] Godot instance created successfully!");
 
+            // Load GDExtension interface from managed context (not from [UnmanagedCallersOnly])
+            LibGodotWeb.LoadGDExtensionInterface();
+
             // Call start() using our minimal binding
             if (!LibGodotWeb.CallGodotInstanceStart(godotInstancePtr))
             {
