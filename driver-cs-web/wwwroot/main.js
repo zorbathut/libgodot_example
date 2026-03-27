@@ -20,18 +20,18 @@ function scheduleNextFrame() {
         try {
             // Call back into C# to run one frame
             // This will be available as a global function after .NET loads
-            if (typeof globalThis.DriverCSWeb !== 'undefined' &&
-                typeof globalThis.DriverCSWeb.Program.RunFrame === 'function') {
+            if (typeof globalThis.GodotLauncher !== 'undefined' &&
+                typeof globalThis.GodotLauncher.RunFrame === 'function') {
 
-                const shouldQuit = globalThis.DriverCSWeb.Program.RunFrame();
+                const shouldQuit = globalThis.GodotLauncher.RunFrame();
 
                 if (shouldQuit) {
                     console.log("[JS] Engine requested shutdown");
                     isRunning = false;
 
                     // Clean up
-                    if (typeof globalThis.DriverCSWeb.Program.Shutdown === 'function') {
-                        globalThis.DriverCSWeb.Program.Shutdown();
+                    if (typeof globalThis.GodotLauncher.Shutdown === 'function') {
+                        globalThis.GodotLauncher.Shutdown();
                     }
                 } else {
                     // Schedule next frame

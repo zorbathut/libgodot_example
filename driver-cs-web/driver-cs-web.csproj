@@ -5,9 +5,15 @@
       <WasmNativeStrip>false</WasmNativeStrip>
       <EmccExtraLDFlags>
           -sEXPORTED_FUNCTIONS=_libgodot_create_godot_instance,_libgodot_destroy_godot_instance,_malloc,_free,_sbrk,_memalign,_memset,_memcpy,_memmove,_gdext_wrapper_set_proc_address,_gdext_wrapper_load_interface,_gdext_wrapper_string_name_new,_gdext_wrapper_classdb_get_method_bind,_gdext_wrapper_object_method_bind_ptrcall,_gdext_wrapper_object_get_instance_id,stackSave,stackRestore,stackAlloc
-          -sUSE_WEBGL2=1
-          -sFULL_ES3=1
-    
+          -sMAX_WEBGL_VERSION=2
+          -sOFFSCREEN_FRAMEBUFFER=1
+          -sGL_ENABLE_GET_PROC_ADDRESS=0
+          -sGL_WORKAROUND_SAFARI_GETCONTEXT_BUG=0
+          -sWASM_BIGINT
+          -sALLOW_MEMORY_GROWTH=1
+          -sEXIT_RUNTIME=1
+          -sSTACK_SIZE=512KB
+
           -lidbfs.js
           -sFORCE_FILESYSTEM=1
           

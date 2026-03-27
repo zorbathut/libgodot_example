@@ -1,11 +1,9 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
-using Godot;
 
 public partial class GodotLauncher
 {
     private static IntPtr godotInstancePtr = IntPtr.Zero;
-    private static GodotInstance? godotInstance = null;
 
     public static void Main(string[] args)
     {
@@ -64,24 +62,8 @@ public partial class GodotLauncher
                 return 1;
             }
 
-            // Get the GodotInstance object from the native pointer
-            godotInstance = LibGodotWeb.GetGodotInstanceFromPtr(godotInstancePtr);
-            if (godotInstance == null)
-            {
-                Console.Error.WriteLine("[C#] Error: Failed to get GodotInstance from pointer");
-                LibGodotWeb.libgodot_destroy_godot_instance(godotInstancePtr);
-                godotInstancePtr = IntPtr.Zero;
-                return 1;
-            }
-
-            Console.WriteLine("[C#] Godot started successfully!");
-
-            // Request the first frame
-            JSHost.ImportAsync("requestAnimationFrame", "./main.js")
-                .ContinueWith(_ =>
-                {
-                    Console.WriteLine("[C#] Starting animation frame loop");
-                });
+            Console.WriteLine("[C#] Godot start() completed successfully!");
+            // Frame loop is started from JavaScript after this returns 0
 
             return 0;
         }
@@ -99,16 +81,16 @@ public partial class GodotLauncher
     [JSExport]
     public static bool RunFrame()
     {
-        if (godotInstance == null)
+        if (godotInstancePtr == IntPtr.Zero)
         {
-            Console.Error.WriteLine("[C#] Error: godotInstance is null in RunFrame");
+            Console.Error.WriteLine("[C#] Error: godotInstancePtr is null in RunFrame");
             return true; // Signal to stop
         }
 
         try
         {
             // iteration() returns true when the engine wants to quit
-            bool shouldQuit = godotInstance.Iteration();
+            bool shouldQuit = LibGodotWeb.CallGodotInstanceIteration(godotInstancePtr);
             return shouldQuit;
         }
         catch (Exception ex)
@@ -130,7 +112,6 @@ public partial class GodotLauncher
         {
             LibGodotWeb.libgodot_destroy_godot_instance(godotInstancePtr);
             godotInstancePtr = IntPtr.Zero;
-            godotInstance = null;
         }
 
         Console.WriteLine("[C#] Godot shutdown complete");

@@ -56,8 +56,9 @@ public static unsafe class LibGodotWeb
     [DllImport(WRAPPERS, CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong gdext_wrapper_object_get_instance_id(IntPtr p_object);
 
-    // Cache for the GodotInstance::start() method bind
+    // Cache for method binds
     private static IntPtr startMethodBind = IntPtr.Zero;
+    private static IntPtr iterationMethodBind = IntPtr.Zero;
 
     // StringName size
     private const int STRING_NAME_SIZE = 8;
@@ -109,10 +110,14 @@ public static unsafe class LibGodotWeb
         try
         {
             gdext_wrapper_string_name_new(classNameStorage, "GodotInstance", 0);
-            gdext_wrapper_string_name_new(methodNameStorage, "start", 0);
 
+            gdext_wrapper_string_name_new(methodNameStorage, "start", 0);
             startMethodBind = gdext_wrapper_classdb_get_method_bind(classNameStorage, methodNameStorage, 2240911060);
             Console.WriteLine($"[C#] GodotInstance::start() method bind: {startMethodBind}");
+
+            gdext_wrapper_string_name_new(methodNameStorage, "iteration", 0);
+            iterationMethodBind = gdext_wrapper_classdb_get_method_bind(classNameStorage, methodNameStorage, 2240911060);
+            Console.WriteLine($"[C#] GodotInstance::iteration() method bind: {iterationMethodBind}");
         }
         finally
         {
@@ -140,13 +145,20 @@ public static unsafe class LibGodotWeb
         }
     }
 
-    public static Godot.GodotInstance? GetGodotInstanceFromPtr(IntPtr godotInstancePtr)
+    public static bool CallGodotInstanceIteration(IntPtr godotInstancePtr)
     {
-        ulong instanceId = gdext_wrapper_object_get_instance_id(godotInstancePtr);
-        if (instanceId == 0)
-            return null;
+        if (iterationMethodBind == IntPtr.Zero)
+            throw new InvalidOperationException("GodotInstance::iteration() method bind not initialized");
 
-        Godot.GodotObject? obj = Godot.GodotObject.InstanceFromId(instanceId);
-        return obj as Godot.GodotInstance;
+        IntPtr retPtr = Marshal.AllocHGlobal(sizeof(byte));
+        try
+        {
+            gdext_wrapper_object_method_bind_ptrcall(iterationMethodBind, godotInstancePtr, IntPtr.Zero, retPtr);
+            return Marshal.ReadByte(retPtr) != 0;
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(retPtr);
+        }
     }
 }

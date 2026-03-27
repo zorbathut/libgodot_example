@@ -1,0 +1,10 @@
+; Engine configuration file.
+
+config_version=5
+
+[application]
+
+config/name="minimal-test"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.6")
+config/icon="res://icon.svg"

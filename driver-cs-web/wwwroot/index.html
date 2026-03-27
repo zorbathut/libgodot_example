@@ -164,6 +164,9 @@
                 // Make Module available globally so preloadFile can access FS
                 globalThis.Module = Module;
 
+                // Set the canvas on the emscripten Module for WebGL context creation
+                Module.canvas = document.getElementById('canvas');
+
                 // Preload the .pck file before initializing Godot
                 await preloadFile('project.pck');
 
@@ -203,6 +206,21 @@
 
                 updateStatus('Godot initialized successfully!');
                 setTimeout(hideStatus, 1000);
+
+                // Start the frame loop
+                function gameLoop() {
+                    try {
+                        const shouldQuit = globalThis.GodotLauncher.RunFrame();
+                        if (!shouldQuit) {
+                            window.requestAnimationFrame(gameLoop);
+                        } else {
+                            globalThis.GodotLauncher.Shutdown();
+                        }
+                    } catch(e) {
+                        console.error('Frame error:', e);
+                    }
+                }
+                window.requestAnimationFrame(gameLoop);
 
             } catch (error) {
                 log(`Error: ${error.message}`, true);
